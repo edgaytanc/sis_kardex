@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-    
+
 
     <div class="card">
         <div class="card-header"><h4>Datos de Entrada</h4></div>
@@ -27,6 +27,9 @@
                 <table class="table table-borderless table-hover">
                     <thead>
                         <tr>
+                            <th class="text-left">
+                                @lang('crud.entradas.inputs.entrada_id')
+                            </th>
                             <th class="text-left">
                                 @lang('crud.entradas.inputs.producto_id')
                             </th>
@@ -47,6 +50,7 @@
                     <tbody>
                         @forelse($entradas as $entrada)
                         <tr>
+                            <td>{{$entrada->id ?? '-' }}</td>
                             <td>{{ optional($entrada->producto)->nombre ?? '-' }}</td>
                             <td>{{ $entrada->cantidad ?? '-' }}</td>
                             <td>{{ $entrada->fecha_vencimiento->format('d-m-Y') ?? '-' }}</td>
@@ -71,18 +75,19 @@
             </div>
         </div>
     </div>
-    
-                
+
+
     <!-- Formulario oculto para almacenar la información del producto seleccionado -->
     <form id="selectedProductForm" method="POST" action="{{ route('salidas.store') }}" style="display: none;">
         @csrf
         <input type="hidden" name="selected_producto_id" id="selected_producto_id">
+        <input type="hidden" name="entrada_id" id="entrada_id"> <!-- Campo agregado -->
         <input type="hidden" name="nombre_producto" id="nombre_producto">
         <input type="hidden" name="lote_salida" id="numero_lote">
         <input type="hidden" name="fecha_vencimiento" id="fecha_vencimiento">
         <!-- Agrega otros campos que desees autocompletar -->
 
-        
+
     </form>
 
     <div class="card">
@@ -94,7 +99,7 @@
 
             <x-form method="POST" action="{{ route('salidas.store') }}" class="mt-4">
                 @include('app.salidas.form-inputs')
-                
+
 
 
                 <div class="mt-4">
@@ -108,7 +113,7 @@
                         @lang('crud.common.create')
                     </button>
 
-                    
+
                 </div>
             </x-form>
         </div>
@@ -119,10 +124,11 @@
 
 <!-- Script JavaScript para manejar la selección del producto -->
 <script>
-    function selectProduct(id, nombre, lote, fechaVencimiento) {
-        document.getElementById('selected_producto_id').value = id;
-        document.getElementById('nombre_producto').value = nombre;
-        document.getElementById('numero_lote').value = lote;
+    function selectProduct(entradaId, nombre, lote, fechaVencimiento) {
+    document.getElementById('entrada_id').value = entradaId;
+    document.getElementById('nombre_producto').value = nombre;
+    document.getElementById('numero_lote').value = lote;
+    console.log("Entrada Id: " + document.getElementById('entrada_id').value);
 
         // Convierte la fecha de vencimiento al formato "Y-m-d" para el input de tipo date
         var formattedFechaVencimiento = formatDate(fechaVencimiento);

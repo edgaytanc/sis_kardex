@@ -73,6 +73,7 @@ return [
         'edit_title' => 'Edit Entrada',
         'show_title' => 'Show Entrada',
         'inputs' => [
+            'entrada_id' => 'Id Entrada',
             'producto_id' => 'Producto',
             'fecha' => 'Fecha',
             'numero_referencia' => 'Numero Referencia',

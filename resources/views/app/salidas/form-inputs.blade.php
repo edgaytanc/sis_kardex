@@ -1,7 +1,18 @@
 @php $editing = isset($salida) @endphp
 
 <div class="row">
-  
+
+
+    <x-inputs.group class="col-sm-12 col-lg-6">
+        <x-inputs.text
+            name="entrada_id"
+            label="Id Entrada"
+            :value="old('id', ($editing ? $salida->entrada_id : ''))"
+            maxlength="255"
+            placeholder="Id Entrada"
+            required
+        ></x-inputs.text>
+    </x-inputs.group>
 
     <x-inputs.group class="col-sm-12 col-lg-6">
         <x-inputs.text
@@ -66,15 +77,15 @@
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12 col-lg-4">
-    <x-inputs.number
-        name="cantidad_salida"
-        label="Cantidad Salida"
-        :value="old('cantidad_salida', ($editing ? $salida->cantidad_salida : ''))"
-        max="255"
-        placeholder="Cantidad Salida"
-        :max="isset($cantidadDisponible) ? $cantidadDisponible : 0"
-    ></x-inputs.number>
-</x-inputs.group>
+        <x-inputs.number
+            name="cantidad_salida"
+            label="Cantidad Salida"
+            :value="old('cantidad_salida', ($editing ? $salida->cantidad_salida : ''))"
+            max="255"
+            placeholder="Cantidad Salida"
+            :max="isset($cantidadDisponible) ? $cantidadDisponible : 0"
+        ></x-inputs.number>
+    </x-inputs.group>
 
     <x-inputs.group class="col-sm-12 col-lg-4">
         <x-inputs.number
