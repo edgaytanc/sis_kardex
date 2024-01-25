@@ -2,7 +2,7 @@
 
 return [
     'common' => [
-        'actions' => 'Actions',
+        'actions' => 'Acciones',
         'create' => 'Create',
         'edit' => 'Edit',
         'update' => 'Update',
@@ -76,12 +76,12 @@ return [
             'entrada_id' => 'Id Entrada',
             'producto_id' => 'Producto',
             'fecha' => 'Fecha',
-            'numero_referencia' => 'Numero Referencia',
+            'numero_referencia' => 'Número Referencia',
             'cantidad' => 'Cantidad',
             'precio_unitario' => 'Precio Unitario',
             'fecha_vencimiento' => 'Fecha Vencimiento',
             'remitente_id' => 'Remitente',
-            'numero_lote' => 'Numero Lote',
+            'numero_lote' => 'Número Lote',
             'reajuste_positivo' => 'Reajuste Positivo',
         ],
     ],

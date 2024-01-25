@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\RemitenteController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\DestinatarioController;
+use App\Http\Controllers\ConsultaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +36,7 @@ Route::prefix('/')
     ->group(function () {
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
-        
+
 
         Route::resource('users', UserController::class);
         Route::resource('productos', ProductoController::class);
@@ -43,4 +44,7 @@ Route::prefix('/')
         Route::resource('entradas', EntradaController::class);
         Route::resource('destinatarios', DestinatarioController::class);
         Route::resource('salidas', SalidaController::class);
+        Route::resource('reporte',ConsultaController::class);
+        Route::get('seleccionar_producto', [ConsultaController::class, 'index'])->name('seleccionar_producto');
+        Route::post('/mostrar-datos', [ConsultaController::class, 'mostrarDatos'])->name('mostrar_datos');
     });

@@ -1,7 +1,7 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="{{ url('/') }}" class="brand-link">
+    <a href="{{ url('/home') }}" class="brand-link">
         <img src="https://vemto.app/favicon.png" alt="Vemto Logo" class="brand-image bg-white img-circle">
         <span class="brand-text font-weight-light">Sis_Kardex</span>
     </a>
@@ -83,7 +83,38 @@
                     </ul>
                 </li>
 
-                @if (Auth::user()->can('view-any', Spatie\Permission\Models\Role::class) || 
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon icon ion-md-document"></i>
+                        <p>
+                            Reportes
+                            <i class="nav-icon right icon ion-md-arrow-round-back"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <!-- Tus otros enlaces de Apps aquí -->
+                        <!-- ... -->
+
+                        <!-- Agrega tu nuevo enlace aquí -->
+                        @can('view-any', App\Models\Producto::class)
+                        <li class="nav-item">
+                            <a href="{{ route('seleccionar_producto') }}" class="nav-link">
+                                <i class="nav-icon icon ion-md-radio-button-off"></i>
+                                <p>Informe por Producto</p>
+                            </a>
+                        </li>
+                        @endcan
+
+                        <!-- Continúa con tus otros enlaces -->
+                        <!-- ... -->
+                    </ul>
+                </li>
+
+
+
+
+                @if (Auth::user()->can('view-any', Spatie\Permission\Models\Role::class) ||
                     Auth::user()->can('view-any', Spatie\Permission\Models\Permission::class))
                 <li class="nav-item">
                     <a href="#" class="nav-link">
