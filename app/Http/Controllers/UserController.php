@@ -52,6 +52,7 @@ class UserController extends Controller
         $validated = $request->validated();
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['localidad'] = $request->input('localidad');
 
         $user = User::create($validated);
 
@@ -100,6 +101,8 @@ class UserController extends Controller
         } else {
             $validated['password'] = Hash::make($validated['password']);
         }
+
+        $validated['localidad'] = $request->input('localidad');
 
         $user->update($validated);
 

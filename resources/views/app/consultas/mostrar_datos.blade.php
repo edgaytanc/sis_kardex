@@ -6,7 +6,7 @@
 <div class="container">
     <h4>MINISTERIO DE SALUD PUBLICA Y ASISTENCIA SOCIAL<BR>
         DIRECCION DEPARTAMENTAL DE REDES INTEGRADAS DE SERVICIOS DE SALUD DE TOTONICAPAN<BR>
-        DEPENDENCIA: <BR>
+        DEPENDENCIA: {{$localidad}} <BR>
         PRODUCTO: {{ $nombreProducto }}
     </h4>
     {{-- <h1>Reporte de Kardex - {{ $nombreProducto }}</h1> --}}

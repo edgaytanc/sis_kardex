@@ -13,6 +13,7 @@ class ConsultaController extends Controller
         $productoId = $request->input('producto_id');
         $producto = Producto::findOrFail($productoId);
         $nombreProducto = $producto->nombre;
+        $localidad = auth()->user()->localidad;
 
         $datos = DB::select("
         SELECT
@@ -63,7 +64,7 @@ class ConsultaController extends Controller
 
         ", ['productoId' => $productoId, 'nombreProducto' => $nombreProducto]);
 
-        return view('app.consultas.mostrar_datos', compact('datos','nombreProducto'));
+        return view('app.consultas.mostrar_datos', compact('datos','nombreProducto','localidad'));
     }
 
 

@@ -33,6 +33,17 @@
         ></x-inputs.password>
     </x-inputs.group>
 
+    <x-inputs.group class="col-sm-12">
+        <x-inputs.text
+            name="localidad"
+            label="Localidad"
+            value="{{ old('localidad', ($editing ? $user->localidad : '')) }}"
+            maxlength="255"
+            placeholder="Localidad"
+        ></x-inputs.text>
+    </x-inputs.group>
+
+
     <div class="form-group col-sm-12 mt-4">
         <h4>Assign @lang('crud.roles.name')</h4>
 

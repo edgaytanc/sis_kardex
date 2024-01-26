@@ -3,7 +3,7 @@
     <!-- Brand Logo -->
     <a href="{{ url('/home') }}" class="brand-link">
         <img src="https://vemto.app/favicon.png" alt="Vemto Logo" class="brand-image bg-white img-circle">
-        <span class="brand-text font-weight-light">Sis_Kardex</span>
+        <span class="brand-text font-weight-light">{{auth()->user()->localidad}}</span>
     </a>
 
     <!-- Sidebar -->

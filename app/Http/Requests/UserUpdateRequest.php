@@ -28,6 +28,7 @@ class UserUpdateRequest extends FormRequest
                 'email',
             ],
             'password' => ['nullable'],
+            'localidad' => 'required|max:255',
             'roles' => 'array',
         ];
     }
