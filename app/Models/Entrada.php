@@ -21,6 +21,7 @@ class Entrada extends Model
         'remitente_id',
         'numero_lote',
         'reajuste_positivo',
+        'id_user',
     ];
 
     protected $searchableFields = ['*'];
@@ -43,5 +44,10 @@ class Entrada extends Model
     public function salidas()
     {
         return $this->hasMany(Salida::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
     }
 }

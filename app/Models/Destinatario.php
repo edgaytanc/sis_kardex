@@ -11,12 +11,17 @@ class Destinatario extends Model
     use HasFactory;
     use Searchable;
 
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre', 'id_user'];
 
     protected $searchableFields = ['*'];
 
     public function salidas()
     {
         return $this->hasMany(Salida::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
     }
 }

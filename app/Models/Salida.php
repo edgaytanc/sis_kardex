@@ -21,6 +21,7 @@ class Salida extends Model
         'lote_salida',
         'cantidad_salida',
         'reajuste_negativo',
+        'id_user',
     ];
 
     protected $searchableFields = ['*'];
@@ -54,7 +55,12 @@ class Salida extends Model
         return $this->entrada->producto_id ?? null;
     }
     public function getCantidadDisponible($lote)
-{
-    return $this->where('numero_lote', $lote)->sum('cantidad');
-}
+    {
+        return $this->where('numero_lote', $lote)->sum('cantidad');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }

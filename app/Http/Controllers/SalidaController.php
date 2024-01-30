@@ -13,6 +13,8 @@ use App\Http\Requests\SalidaStoreRequest;
 use App\Http\Requests\SalidaUpdateRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 
 class SalidaController extends Controller
 {
@@ -96,6 +98,7 @@ class SalidaController extends Controller
         $selectedNumeroLote = $request->input('lote_salida');
         $selectedFechaVencimiento = $request->input('fecha_vencimiento');
         $entradaId = $request->input('entrada_id');
+        $userId = Auth::id();
 
         $cantidadDisponible = Entrada::where('numero_lote', $selectedNumeroLote)->sum('cantidad');
 
@@ -134,6 +137,7 @@ class SalidaController extends Controller
             'destinatario_id' => $request->input('destinatario_id'),
             'cantidad_salida' => $request->input('cantidad_salida'),
             'reajuste_negativo' => $request->input('reajuste_negativo'),
+            'id_user' => $userId,
         ]);
 
         $salida->save();
@@ -183,6 +187,7 @@ class SalidaController extends Controller
         $this->authorize('update', $salida);
 
         $validated = $request->validated();
+        $validated['id_user'] = Auth::id();
 
         $salida->update($validated);
 

@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\EntradaStoreRequest;
 use App\Http\Requests\EntradaUpdateRequest;
+use Illuminate\Support\Facades\Auth;
+
 
 class EntradaController extends Controller
 {
@@ -51,6 +53,7 @@ class EntradaController extends Controller
         $this->authorize('create', Entrada::class);
 
         $validated = $request->validated();
+        $validated['id_user'] = Auth::id();
 
         $entrada = Entrada::create($validated);
 
@@ -95,6 +98,7 @@ class EntradaController extends Controller
         $this->authorize('update', $entrada);
 
         $validated = $request->validated();
+        $validated['id_user'] = Auth::id();
 
         $entrada->update($validated);
 

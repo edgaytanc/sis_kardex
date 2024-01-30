@@ -11,12 +11,17 @@ class Remitente extends Model
     use HasFactory;
     use Searchable;
 
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre','id_user'];
 
     protected $searchableFields = ['*'];
 
     public function entradas()
     {
         return $this->hasMany(Entrada::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
     }
 }
