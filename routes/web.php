@@ -47,4 +47,6 @@ Route::prefix('/')
         Route::resource('reporte',ConsultaController::class);
         Route::get('seleccionar_producto', [ConsultaController::class, 'index'])->name('seleccionar_producto');
         Route::post('/mostrar-datos', [ConsultaController::class, 'mostrarDatos'])->name('mostrar_datos');
+        Route::get('/reporte/{productoId}/pdf', [ConsultaController::class, 'generatePdf'])->name('reporte_pdf');
+
     });
