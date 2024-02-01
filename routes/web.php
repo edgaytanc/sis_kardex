@@ -12,6 +12,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\DestinatarioController;
 use App\Http\Controllers\ConsultaController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ExportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,5 +50,11 @@ Route::prefix('/')
         Route::get('seleccionar_producto', [ConsultaController::class, 'index'])->name('seleccionar_producto');
         Route::post('/mostrar-datos', [ConsultaController::class, 'mostrarDatos'])->name('mostrar_datos');
         Route::get('/reporte/{productoId}/pdf', [ConsultaController::class, 'generatePdf'])->name('reporte_pdf');
-
+        Route::get('export',[ExportController::class,'index'])->name('export.index');
+        Route::get('/export/users',[ExportController::class,'users'])->name('export.users');
+        Route::get('/export/destinatarios',[ExportController::class,'destinatarios'])->name('export.destinatarios');
+        Route::get('/export/remitentes',[ExportController::class,'remitentes'])->name('export.remitentes');
+        Route::get('/export/entradas',[ExportController::class,'entradas'])->name('export.entradas');
+        Route::get('/export/salidas',[ExportController::class,'salidas'])->name('export.salidas');
+        Route::get('users/export/', [UserController::class, 'export']);
     });

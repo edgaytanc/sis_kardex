@@ -24,6 +24,15 @@
                 </li>
 
                 <li class="nav-item">
+                    <a href="{{ route('export.index') }}" class="nav-link">
+                        <i class="nav-icon icon ion-md-pulse"></i>
+                        <p>
+                            Exportaciones
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon icon ion-md-apps"></i>
                         <p>
