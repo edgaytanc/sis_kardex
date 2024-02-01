@@ -11,6 +11,7 @@ use App\Http\Controllers\RemitenteController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\DestinatarioController;
 use App\Http\Controllers\ConsultaController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
