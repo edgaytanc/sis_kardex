@@ -34,27 +34,27 @@ class ExportController extends Controller
 
     public function users()
     {
-        return Excel::download(new UsersExport, 'users.xlsx');
+        return Excel::download(new UsersExport, 'users.csv');
     }
 
     public function destinatarios()
     {
-        return Excel::download(new DestinatariosExport, 'destinatarios.xlsx');
+        return Excel::download(new DestinatariosExport, 'destinatarios.csv');
     }
 
     public function remitentes()
     {
-        return Excel::download(new RemitentesExport, 'remitentes.xlsx');
+        return Excel::download(new RemitentesExport, 'remitentes.csv');
     }
 
     public function entradas()
     {
-        return Excel::download(new EntradasExport, 'entradas.xlsx');
+        return Excel::download(new EntradasExport, 'entradas.csv');
     }
 
     public function salidas()
     {
-        return Excel::download(new SalidasExport, 'salidas.xlsx');
+        return Excel::download(new SalidasExport, 'salidas.csv');
     }
 
 

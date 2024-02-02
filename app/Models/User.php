@@ -20,7 +20,8 @@ class User extends Authenticatable
 
     protected $searchableFields = ['*'];
 
-    protected $hidden = ['password', 'remember_token'];
+    // protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['remember_token'];
 
     protected $casts = [
         'email_verified_at' => 'datetime',

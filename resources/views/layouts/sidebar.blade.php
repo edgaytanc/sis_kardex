@@ -27,7 +27,7 @@
                     <a href="{{ route('export.index') }}" class="nav-link">
                         <i class="nav-icon icon ion-md-pulse"></i>
                         <p>
-                            Exportaciones
+                            Import/Export
                         </p>
                     </a>
                 </li>

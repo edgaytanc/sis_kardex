@@ -13,6 +13,7 @@ use App\Http\Controllers\DestinatarioController;
 use App\Http\Controllers\ConsultaController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\ImportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,4 +58,10 @@ Route::prefix('/')
         Route::get('/export/entradas',[ExportController::class,'entradas'])->name('export.entradas');
         Route::get('/export/salidas',[ExportController::class,'salidas'])->name('export.salidas');
         Route::get('users/export/', [UserController::class, 'export']);
+
+        Route::post('users/import', [ImportController::class, 'import_users'])->name('users.import');
+        Route::post('entradas/import', [ImportController::class, 'import_entradas'])->name('entradas.import');
+        Route::post('salidas/import', [ImportController::class, 'import_salidas'])->name('salidas.import');
+        Route::post('destinatarios/import', [ImportController::class, 'import_destinatarios'])->name('destinatarios.import');
+        Route::post('remitentes/import', [ImportController::class, 'import_remitentes'])->name('remitentes.import');
     });
