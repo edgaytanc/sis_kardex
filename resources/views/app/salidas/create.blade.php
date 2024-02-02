@@ -92,7 +92,7 @@
     function selectProduct(entradaId, nombre, lote, fechaVencimiento) {
     document.getElementById('entrada_id').value = entradaId;
     document.getElementById('nombre_producto').value = nombre;
-    document.getElementById('numero_lote').value = lote;
+    document.getElementById('lote_salida').value = lote;
     console.log("Entrada Id: " + document.getElementById('entrada_id').value);
 
         // Convierte la fecha de vencimiento al formato "Y-m-d" para el input de tipo date

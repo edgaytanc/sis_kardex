@@ -23,6 +23,8 @@
                 <th >NUMERO LOTE</th>
                 <th >CANTIDAD SALIDA</th>
                 <th >REAJUSTE(+)(-)</th>
+                <th >CANTIDAD TOTAL</th>
+                <th >PRECIO</th>
             </tr>
         </thead>
         <tbody>
