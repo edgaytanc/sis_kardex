@@ -37,7 +37,7 @@
             name="cantidad"
             label="Cantidad"
             :value="old('cantidad', ($editing ? $entrada->cantidad : ''))"
-            max="255"
+            max="1024"
             step="0.01"
             placeholder="Cantidad"
         ></x-inputs.number>

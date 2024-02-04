@@ -22,6 +22,9 @@ class Salida extends Model
         'cantidad_salida',
         'reajuste_negativo',
         'id_user',
+        'precio_unitario',
+        'cantidad_actual',
+        'precio',
     ];
 
     protected $searchableFields = ['*'];

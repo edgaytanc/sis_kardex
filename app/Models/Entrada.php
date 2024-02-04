@@ -22,6 +22,8 @@ class Entrada extends Model
         'numero_lote',
         'reajuste_positivo',
         'id_user',
+        'cantidad_actual',
+        'precio',
     ];
 
     protected $searchableFields = ['*'];

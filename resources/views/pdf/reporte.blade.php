@@ -41,6 +41,9 @@
                 <th>Número Lote</th>
                 <th>Cantidad Salida</th>
                 <th>Reajuste</th>
+                <th>Cantidad Total</th>
+                <th>Precio</th>
+                <th>Observaciones</th>
             </tr>
         </thead>
         <tbody>
@@ -56,6 +59,9 @@
                     <td>{{ $dato->Numero_Lote }}</td>
                     <td>{{ $dato->Cantidad_Salida }}</td>
                     <td>{{ $dato->Reajuste }}</td>
+                    <td>{{ $dato->Cantidad_Total}}</td>
+                    <td>{{ $dato->Precio}}</td>
+                    <td></td>
                 </tr>
             @endforeach
         </tbody>

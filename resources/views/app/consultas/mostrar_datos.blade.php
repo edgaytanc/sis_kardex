@@ -7,7 +7,8 @@
     <h4>MINISTERIO DE SALUD PUBLICA Y ASISTENCIA SOCIAL<BR>
         DIRECCION DEPARTAMENTAL DE REDES INTEGRADAS DE SERVICIOS DE SALUD DE TOTONICAPAN<BR>
         DEPENDENCIA: {{$localidad}} <BR>
-        PRODUCTO: {{ $nombreProducto }}
+        PRODUCTO: {{ $nombreProducto }} <BR>
+
     </h4>
     {{-- <h1>Reporte de Kardex - {{ $nombreProducto }}</h1> --}}
     <table class="table table-bordered">
@@ -40,6 +41,8 @@
                     <td class="p-1">{{ $dato->Numero_Lote }}</td>
                     <td class="p-1">{{ $dato->Cantidad_Salida }}</td>
                     <td class="p-1">{{ $dato->Reajuste }}</td>
+                    <td class="p-1">{{ $dato->Cantidad_Total}}</td>
+                    <td class="p-1">{{ $dato->Precio}}</td>
                 </tr>
             @empty
                 <tr>

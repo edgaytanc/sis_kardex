@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Producto;
+use App\Models\Entrada;
 use Barryvdh\DomPDF\PDF;
 
 class ConsultaController extends Controller
@@ -15,9 +16,16 @@ class ConsultaController extends Controller
         $producto = Producto::findOrFail($productoId);
         $nombreProducto = $producto->nombre;
         $localidad = auth()->user()->localidad;
-        $userId = auth()->user()->id; // Obtener el id del usuario actual
+        $userId = auth()->user()->id;
 
-        $datos = DB::select("
+        // Obtiene el último precio unitario no NULL para usarlo como valor predeterminado
+        $precio_unitario = DB::table('entradas')
+            ->where('cantidad_actual', '>', 0)
+            ->whereNotNull('precio_unitario')
+            ->orderByDesc('fecha')
+            ->value('precio_unitario');
+
+            $datos = DB::select("
             SELECT *
             FROM (
                 SELECT
@@ -30,7 +38,9 @@ class ConsultaController extends Controller
                     DATE_FORMAT(e.fecha_vencimiento, '%d/%m/%Y') AS Fecha_vencimiento,
                     e.numero_lote AS Numero_Lote,
                     NULL AS Cantidad_Salida,
-                    e.reajuste_positivo AS Reajuste
+                    e.reajuste_positivo AS Reajuste,
+                    e.cantidad As Cantidad_Total,
+                    e.precio As Precio
                 FROM
                     entradas e
                 LEFT JOIN
@@ -45,12 +55,14 @@ class ConsultaController extends Controller
                     s.numero_referencia AS Numero_de_referencia,
                     des.nombre AS Remitente_Destinatario,
                     NULL AS Cantidad_Entrada,
-                    NULL AS Precio_Unitario,
+                    s.precio_unitario AS Precio_Unitario,
                     NULL AS Valor_Total,
                     DATE_FORMAT(s.fecha_vencimiento, '%d/%m/%Y') AS Fecha_vencimiento,
                     s.lote_salida AS Numero_Lote,
                     s.cantidad_salida AS Cantidad_Salida,
-                    s.reajuste_negativo AS Reajuste
+                    s.reajuste_negativo AS Reajuste,
+                    s.cantidad_actual AS Cantidad_Total,
+                    s.precio AS Precio
                 FROM
                     salidas s
                 LEFT JOIN
@@ -66,11 +78,9 @@ class ConsultaController extends Controller
             'userIdSalida' => $userId
         ]);
 
-
         return view('app.consultas.mostrar_datos', compact('datos','nombreProducto','localidad','productoId'));
-
-
     }
+
 
 
     public function generatePdf($productoId)
@@ -93,7 +103,9 @@ class ConsultaController extends Controller
                     DATE_FORMAT(e.fecha_vencimiento, '%d/%m/%Y') AS Fecha_vencimiento,
                     e.numero_lote AS Numero_Lote,
                     NULL AS Cantidad_Salida,
-                    e.reajuste_positivo AS Reajuste
+                    e.reajuste_positivo AS Reajuste,
+                    e.cantidad As Cantidad_Total,
+                    e.precio As Precio
                 FROM
                     entradas e
                 LEFT JOIN
@@ -108,12 +120,14 @@ class ConsultaController extends Controller
                     s.numero_referencia AS Numero_de_referencia,
                     des.nombre AS Remitente_Destinatario,
                     NULL AS Cantidad_Entrada,
-                    NULL AS Precio_Unitario,
+                    s.precio_unitario AS Precio_Unitario,
                     NULL AS Valor_Total,
                     DATE_FORMAT(s.fecha_vencimiento, '%d/%m/%Y') AS Fecha_vencimiento,
                     s.lote_salida AS Numero_Lote,
                     s.cantidad_salida AS Cantidad_Salida,
-                    s.reajuste_negativo AS Reajuste
+                    s.reajuste_negativo AS Reajuste,
+                    s.cantidad_actual AS Cantidad_Total,
+                    s.precio AS Precio
                 FROM
                     salidas s
                 LEFT JOIN
