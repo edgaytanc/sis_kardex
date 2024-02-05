@@ -50,7 +50,8 @@ Route::prefix('/')
         Route::resource('reporte',ConsultaController::class);
         Route::get('seleccionar_producto', [ConsultaController::class, 'index'])->name('seleccionar_producto');
         Route::post('/mostrar-datos', [ConsultaController::class, 'mostrarDatos'])->name('mostrar_datos');
-        Route::get('/reporte/{productoId}/pdf', [ConsultaController::class, 'generatePdf'])->name('reporte_pdf');
+        Route::get('/reporte/{productoId}/{userId}/pdf', [ConsultaController::class, 'generatePdf'])->name('reporte_pdf');
+
         Route::get('export',[ExportController::class,'index'])->name('export.index');
         Route::get('/export/users',[ExportController::class,'users'])->name('export.users');
         Route::get('/export/destinatarios',[ExportController::class,'destinatarios'])->name('export.destinatarios');
@@ -58,10 +59,21 @@ Route::prefix('/')
         Route::get('/export/entradas',[ExportController::class,'entradas'])->name('export.entradas');
         Route::get('/export/salidas',[ExportController::class,'salidas'])->name('export.salidas');
         Route::get('users/export/', [UserController::class, 'export']);
+        Route::get('/export/all', [ExportController::class,'exportAll'])->name('export.all');
 
         Route::post('users/import', [ImportController::class, 'import_users'])->name('users.import');
         Route::post('entradas/import', [ImportController::class, 'import_entradas'])->name('entradas.import');
         Route::post('salidas/import', [ImportController::class, 'import_salidas'])->name('salidas.import');
         Route::post('destinatarios/import', [ImportController::class, 'import_destinatarios'])->name('destinatarios.import');
         Route::post('remitentes/import', [ImportController::class, 'import_remitentes'])->name('remitentes.import');
+        Route::post('/importar', [ImportController::class,'import'])->name('importar');
+
+        // Ruta para mostrar el formulario de selección de usuario
+        Route::get('/select-user', [ConsultaController::class, 'selectUser'])->name('select_user');
+
+        // Ruta para procesar la selección del usuario y redirigir
+        Route::post('/process-user-selection', [ConsultaController::class, 'processUserSelection'])->name('process_user_selection');
+
+
+
     });

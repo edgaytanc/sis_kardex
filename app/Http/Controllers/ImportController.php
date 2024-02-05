@@ -9,6 +9,7 @@ use App\Imports\SalidasImport;
 use App\Imports\DestinatariosImport;
 use App\Imports\RemitentesImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CompleteImport;
 
 class ImportController extends Controller
 {
@@ -45,5 +46,11 @@ class ImportController extends Controller
         Excel::import(new RemitentesImport, $request->file('file'));
 
         return redirect()->back()->with('success', 'Importación completada con éxito.');
+    }
+
+    public function import(Request $request) {
+        Excel::import(new CompleteImport, $request->file('file'));
+
+        return back()->with('success', 'Importación completa.');
     }
 }

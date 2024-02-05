@@ -51,7 +51,7 @@
             @endforelse
         </tbody>
     </table>
-    <a href="{{ route('reporte_pdf', ['productoId' => $productoId]) }}" class="btn btn-primary">Descargar PDF</a>
+    <a href="{{ route('reporte_pdf', ['productoId' => $productoId, 'userId' => $userId]) }}" class="btn btn-primary">Descargar PDF</a>
 
 </div>
 @endsection

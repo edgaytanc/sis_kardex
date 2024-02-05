@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Producto;
 use App\Models\Entrada;
 use Barryvdh\DomPDF\PDF;
+use App\Models\User;
 
 class ConsultaController extends Controller
 {
@@ -15,8 +16,24 @@ class ConsultaController extends Controller
         $productoId = $request->input('producto_id');
         $producto = Producto::findOrFail($productoId);
         $nombreProducto = $producto->nombre;
-        $localidad = auth()->user()->localidad;
-        $userId = auth()->user()->id;
+        $userId = $request->input('user_id');
+
+        $user = User::find($userId);
+
+        // Verifica si el usuario existe antes de intentar acceder a su localidad
+        if ($user) {
+            $localidad = $user->localidad;
+        } else {
+            // Manejar el caso en que el usuario no existe, por ejemplo, asignar un valor predeterminado a $localidad o lanzar un error
+            $localidad = auth()->user()->localidad;
+        }
+
+        // Usa el userId enviado desde la vista si está disponible, de lo contrario, usa el userId del usuario activo
+
+        if($userId==null){
+            $userId= auth()->user()->id;
+            // $localidad = auth()->user()->localidad;
+        }
 
         // Obtiene el último precio unitario no NULL para usarlo como valor predeterminado
         $precio_unitario = DB::table('entradas')
@@ -78,17 +95,37 @@ class ConsultaController extends Controller
             'userIdSalida' => $userId
         ]);
 
-        return view('app.consultas.mostrar_datos', compact('datos','nombreProducto','localidad','productoId'));
+        return view('app.consultas.mostrar_datos', compact('datos','nombreProducto','localidad','productoId','userId'));
     }
 
 
 
-    public function generatePdf($productoId)
+    public function generatePdf($productoId, $userId)
     {
         $producto = Producto::findOrFail($productoId);
         $nombreProducto = $producto->nombre;
-        $localidad = auth()->user()->localidad;
-        $userId = auth()->user()->id;
+
+        $user = User::find($userId);
+
+        // Verifica si el usuario existe antes de intentar acceder a su localidad
+        if ($user) {
+            $localidad = $user->localidad;
+        } else {
+            // Manejar el caso en que el usuario no existe, por ejemplo, asignar un valor predeterminado a $localidad o lanzar un error
+            $localidad = auth()->user()->localidad;
+        }
+
+        // Usa el userId enviado desde la vista si está disponible, de lo contrario, usa el userId del usuario activo
+
+        if($userId==null){
+            $userId= auth()->user()->id;
+            // $localidad = auth()->user()->localidad;
+        }
+
+
+
+        // $localidad = auth()->user()->localidad;
+        // $userId = auth()->user()->id;
 
         $datos = DB::select("
             SELECT *
@@ -153,9 +190,27 @@ class ConsultaController extends Controller
 
 
 
-    public function index()
+    public function index(Request $request)
     {
         $productos = Producto::all();
-        return view('app.consultas.seleccionar_producto', compact('productos'));
+        $userId = $request->query('userId',null);
+        return view('app.consultas.seleccionar_producto', compact('productos','userId'));
     }
+
+    public function selectUser()
+    {
+        $users = User::all(); // Obtener todos los usuarios
+        return view('app.consultas.select_user', compact('users')); // Mostrar la vista con los usuarios
+    }
+
+    public function processUserSelection(Request $request)
+    {
+        $userId = $request->input('user_id'); // Obtener el ID del usuario seleccionado
+        // Redirigir a la vista de selección de producto con el ID del usuario como parámetro
+        return redirect()->route('seleccionar_producto', ['userId' => $userId]);
+    }
+
+
+
+
 }

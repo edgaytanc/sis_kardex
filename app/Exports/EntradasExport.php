@@ -14,7 +14,7 @@ class EntradasExport implements FromCollection, WithHeadings, WithCustomCsvSetti
     */
     public function collection()
     {
-        return Entrada::select('id','producto_id','fecha','numero_referencia','cantidad','precio_unitario','fecha_vencimiento','remitente_id','numero_lote','reajuste_positivo','id_user')->get();
+        return Entrada::select('id','producto_id','fecha','numero_referencia','cantidad','precio_unitario','fecha_vencimiento','remitente_id','numero_lote','reajuste_positivo','id_user','cantidad_actual','precio')->get();
     }
 
     /**
@@ -34,6 +34,8 @@ class EntradasExport implements FromCollection, WithHeadings, WithCustomCsvSetti
             'numero_lote',
             'reajuste_positivo',
             'id_user',
+            'cantidad_actual',
+            'precio',
         ];
     }
 

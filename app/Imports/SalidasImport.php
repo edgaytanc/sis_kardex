@@ -33,6 +33,9 @@ class SalidasImport implements ToModel, WithHeadingRow
                 'cantidad_salida' => $row['cantidad_salida'],
                 'reajuste_negativo' => $row['reajuste_negativo'],
                 'id_user' => $row['id_user'],
+                'cantidad_actual' => $row['cantidad_actual'],
+                'precio' => $row['precio'],
+                'precio_unitario' => $row['precio_unitario'],
             ]);
             return null; // retorna new para no crear un nuevo modelo
 
@@ -49,6 +52,9 @@ class SalidasImport implements ToModel, WithHeadingRow
                 'cantidad_salida' => $row['cantidad_salida'],
                 'reajuste_negativo' => $row['reajuste_negativo'],
                 'id_user' => $row['id_user'],
+                'cantidad_actual' => $row['cantidad_actual'],
+                'precio' => $row['precio'],
+                'precio_unitario' => $row['precio_unitario'],
             ]);
         }
     }

@@ -29,6 +29,8 @@ class EntradasImport implements ToModel, WithHeadingRow
                 'numero_lote' => $row['numero_lote'],
                 'reajuste_positivo' => $row['reajuste_positivo'],
                 'id_user' => $row['id_user'],
+                'cantidad_actual' => $row['cantidad_actual'],
+                'precio' => $row['precio'],
             ]);
             return null; // Retorna null para no crear un nuevo modelo
         } else {
@@ -45,6 +47,8 @@ class EntradasImport implements ToModel, WithHeadingRow
                 'numero_lote' => $row['numero_lote'],
                 'reajuste_positivo' => $row['reajuste_positivo'],
                 'id_user' => $row['id_user'],
+                'cantidad_actual' => $row['cantidad_actual'],
+                'precio' => $row['precio'],
             ]);
         }
     }

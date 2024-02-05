@@ -23,14 +23,19 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('export.index') }}" class="nav-link">
-                        <i class="nav-icon icon ion-md-pulse"></i>
-                        <p>
-                            Import/Export
-                        </p>
-                    </a>
-                </li>
+                {{-- @auth
+                    @if(Auth::user()->hasRole('super-admin')) --}}
+                        <li class="nav-item">
+                            <a href="{{ route('export.index') }}" class="nav-link">
+                                <i class="nav-icon icon ion-md-pulse"></i>
+                                <p>
+                                    Import/Export
+                                </p>
+                            </a>
+                        </li>
+                    {{-- @endif
+                @endauth --}}
+
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -154,6 +159,21 @@
                     </ul>
                 </li>
                 @endif
+                @endauth
+
+                @auth
+                    @if(Auth::user()->hasRole('super-admin'))
+                        <li class="nav-item">
+                            <a href="{{route('select_user')}}" class="nav-link">
+                                <i class="nav-icon icon ion-md-key"></i>
+                                <p>
+                                    Control Management
+                                    {{-- <i class="nav-icon right icon ion-md-arrow-round-back"></i> --}}
+                                </p>
+                            </a>
+
+                        </li>
+                    @endif
                 @endauth
 
                 <li class="nav-item">

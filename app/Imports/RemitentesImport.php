@@ -14,7 +14,7 @@ class RemitentesImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         //Verifica si existe un registro con el ID proporcionado.
-        $$remitente = Remitente::find($row['id']);
+        $remitente = Remitente::find($row['id']);
 
         if($remitente){
             //Actualiza el registro existente

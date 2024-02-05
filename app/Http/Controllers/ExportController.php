@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CompleteExport;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Exports\UsersExport;
@@ -11,6 +12,7 @@ use App\Exports\RemitentesExport;
 use App\Exports\SalidasExport;
 use App\Models\Destinatario;
 use Maatwebsite\Excel\Facades\Excel;
+
 
 class ExportController extends Controller
 {
@@ -55,6 +57,11 @@ class ExportController extends Controller
     public function salidas()
     {
         return Excel::download(new SalidasExport, 'salidas.csv');
+    }
+
+    public function exportAll()
+    {
+        return Excel::download(new CompleteExport, 'reporte_completo.xlsx');
     }
 
 
