@@ -55,6 +55,10 @@ class EntradaController extends Controller
         $validated = $request->validated();
         $validated['id_user'] = Auth::id();
 
+        // Asignar el valor de cantidad a cantidad_actual
+        $validated['cantidad_actual'] = $validated['cantidad'];
+        $validated['precio'] = $validated['cantidad'] * $validated['precio_unitario'];
+
         $entrada = Entrada::create($validated);
 
         return redirect()
@@ -99,6 +103,11 @@ class EntradaController extends Controller
 
         $validated = $request->validated();
         $validated['id_user'] = Auth::id();
+
+        // Asignar el valor de cantidad a cantidad_actual solo si se proporciona cantidad
+        if (isset($validated['cantidad'])) {
+            $validated['cantidad_actual'] = $validated['cantidad'];
+        }
 
         $entrada->update($validated);
 
