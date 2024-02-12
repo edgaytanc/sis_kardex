@@ -8,6 +8,7 @@ use App\Imports\EntradasImport;
 use App\Imports\SalidasImport;
 use App\Imports\DestinatariosImport;
 use App\Imports\RemitentesImport;
+use App\Imports\ProductosImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\CompleteImport;
 
@@ -53,4 +54,12 @@ class ImportController extends Controller
 
         return back()->with('success', 'Importación completa.');
     }
+
+    public function import_productos(Request $request)
+    {
+        Excel::import(new ProductosImport, $request->file('file'));
+
+        return redirect()->back()->with('success', 'Productos importados con éxito.');
+    }
+
 }

@@ -69,6 +69,11 @@ Route::prefix('/')
         Route::post('remitentes/import', [ImportController::class, 'import_remitentes'])->name('remitentes.import');
         Route::post('/importar', [ImportController::class,'import'])->name('importar');
 
+        //Rutas para importar y exportar productos
+        Route::get('/export/productos', [ExportController::class, 'productos'])->name('export.productos');
+        Route::post('/productos/import', [ImportController::class, 'import_productos'])->name('productos.import');
+
+
         // Ruta para mostrar el formulario de selección de usuario
         Route::get('/select-user', [ConsultaController::class, 'selectUser'])->name('select_user');
 
@@ -76,7 +81,7 @@ Route::prefix('/')
         Route::post('/process-user-selection', [ConsultaController::class, 'processUserSelection'])->name('process_user_selection');
 
         // Ruta para el reporte de Kardex
-        Route::get('/consolidado-kardex', [ConsolidadoKardexController::class, 'index']);
+        Route::get('/consolidado-kardex', [ConsolidadoKardexController::class, 'index'])->name('consolidado.kardex');
         Route::post('/consolidado-kardex/filtrar', [ConsolidadoKardexController::class, 'filtrar']);
         Route::post('/consolidado-kardex/pdf', [ConsolidadoKardexController::class, 'generarPDF']);
 

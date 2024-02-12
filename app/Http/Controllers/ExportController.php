@@ -10,6 +10,7 @@ use App\Exports\DestinatariosExport;
 use App\Exports\EntradasExport;
 use App\Exports\RemitentesExport;
 use App\Exports\SalidasExport;
+use App\Exports\ProductosExport;
 use App\Models\Destinatario;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -63,6 +64,12 @@ class ExportController extends Controller
     {
         return Excel::download(new CompleteExport, 'reporte_completo.xlsx');
     }
+
+    public function productos()
+    {
+        return Excel::download(new ProductosExport, 'productos.xlsx');
+    }
+
 
 
 

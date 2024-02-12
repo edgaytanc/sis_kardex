@@ -118,6 +118,12 @@
                                 <p>Informe por Producto</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('consolidado.kardex') }}" class="nav-link">
+                                <i class="nav-icon icon ion-md-radio-button-off"></i>
+                                <p>Consolidado Kardex</p>
+                            </a>
+                        </li>
                         @endcan
 
                         <!-- Continúa con tus otros enlaces -->
