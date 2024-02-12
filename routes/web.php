@@ -14,6 +14,7 @@ use App\Http\Controllers\ConsultaController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\ConsolidadoKardexController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,13 @@ Route::prefix('/')
 
         // Ruta para procesar la selección del usuario y redirigir
         Route::post('/process-user-selection', [ConsultaController::class, 'processUserSelection'])->name('process_user_selection');
+
+        // Ruta para el reporte de Kardex
+        Route::get('/consolidado-kardex', [ConsolidadoKardexController::class, 'index']);
+        Route::post('/consolidado-kardex/filtrar', [ConsolidadoKardexController::class, 'filtrar']);
+        Route::post('/consolidado-kardex/pdf', [ConsolidadoKardexController::class, 'generarPDF']);
+
+
 
 
 
