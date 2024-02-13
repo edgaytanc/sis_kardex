@@ -14,6 +14,9 @@ use App\Http\Requests\SalidaUpdateRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
+
 
 
 class SalidaController extends Controller
@@ -176,9 +179,24 @@ class SalidaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Salida $salida): View
+    public function edit(Request $request, Salida $salida): View|RedirectResponse
     {
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRole('super-admin');
+
+        // Añadir restricción basada en la fecha para usuarios que no son super-admin
+        if (!$isSuperAdmin) {
+            $fechaSalida = Carbon::parse($salida->fecha);
+            $fechaLimite = Carbon::now()->subMonth();
+
+            if ($fechaSalida->lt($fechaLimite)) {
+                return redirect()->route('salidas.index')->with('error', 'No puedes editar registros con más de un mes de antigüedad.');
+            }
+        }
+
         $this->authorize('update', $salida);
+
+
 
         $entradasSelect = Entrada::pluck('fecha', 'id');
         $destinatarios = Destinatario::pluck('nombre', 'id');

@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\EntradaStoreRequest;
 use App\Http\Requests\EntradaUpdateRequest;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 
 class EntradaController extends Controller
@@ -79,8 +80,21 @@ class EntradaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Entrada $entrada): View
+    public function edit(Request $request, Entrada $entrada): View|RedirectResponse
     {
+
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRole('super-admin');
+
+        if (!$isSuperAdmin) {
+            $fechaEntrada = Carbon::parse($entrada->fecha);
+            $fechaLimite = Carbon::now()->subMonth();
+
+            if ($fechaEntrada->lt($fechaLimite)) {
+                return redirect()->route('entradas.index')->with('error', 'No puedes editar registros con más de un mes de antigüedad.');
+            }
+        }
+
         $this->authorize('update', $entrada);
 
         $productos = Producto::pluck('nombre', 'id');
