@@ -85,6 +85,11 @@ Route::prefix('/')
         Route::post('/consolidado-kardex/filtrar', [ConsolidadoKardexController::class, 'filtrar']);
         Route::post('/consolidado-kardex/pdf', [ConsolidadoKardexController::class, 'generarPDF']);
 
+        //Ruta de cambio de permiso
+        Route::get('/permisos', [UserController::class,'permiso'])->name('users.permisos');
+        Route::post('/users/{user}/permission', [UserController::class, 'updatePermission'])->name('users.updatePermission');
+
+
 
 
 

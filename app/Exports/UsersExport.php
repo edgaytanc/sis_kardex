@@ -14,7 +14,7 @@ class UsersExport implements FromCollection, WithHeadings, WithCustomCsvSettings
     */
     public function collection()
     {
-        return User::select('name', 'email', 'password', 'localidad')->get();
+        return User::select('name', 'email', 'password', 'localidad','permiso')->get();
     }
 
     /**
@@ -27,6 +27,7 @@ class UsersExport implements FromCollection, WithHeadings, WithCustomCsvSettings
             'Email',
             'Password',
             'Localidad',
+            'Permiso',
         ];
     }
 

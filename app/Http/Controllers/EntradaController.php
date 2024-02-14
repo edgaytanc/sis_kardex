@@ -84,9 +84,10 @@ class EntradaController extends Controller
     {
 
         $user = auth()->user();
+        $permiso =$user->permiso;
         $isSuperAdmin = $user->hasRole('super-admin');
 
-        if (!$isSuperAdmin) {
+        if (!$isSuperAdmin && $permiso==0) {
             $fechaEntrada = Carbon::parse($entrada->fecha);
             $fechaLimite = Carbon::now()->subMonth();
 

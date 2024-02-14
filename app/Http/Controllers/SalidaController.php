@@ -182,10 +182,11 @@ class SalidaController extends Controller
     public function edit(Request $request, Salida $salida): View|RedirectResponse
     {
         $user = auth()->user();
+        $permiso =$user->permiso;
         $isSuperAdmin = $user->hasRole('super-admin');
 
         // Añadir restricción basada en la fecha para usuarios que no son super-admin
-        if (!$isSuperAdmin) {
+        if (!$isSuperAdmin && $permiso==0) {
             $fechaSalida = Carbon::parse($salida->fecha);
             $fechaLimite = Carbon::now()->subMonth();
 

@@ -50,6 +50,7 @@ class UserController extends Controller
     public function store(UserStoreRequest $request): RedirectResponse
     {
         $this->authorize('create', User::class);
+        $roleNames = Role::whereIn('id',$request->roles)->pluck('name');  //prueba de error
 
         $validated = $request->validated();
 
@@ -58,7 +59,8 @@ class UserController extends Controller
 
         $user = User::create($validated);
 
-        $user->syncRoles($request->roles);
+        // $user->syncRoles($request->roles);
+        $user->syncRoles($roleNames); // prueba de error
 
         return redirect()
             ->route('users.edit', $user)
@@ -94,7 +96,11 @@ class UserController extends Controller
         UserUpdateRequest $request,
         User $user
     ): RedirectResponse {
+
+
         $this->authorize('update', $user);
+
+        $roleNames = Role::whereIn('id', $request->roles)->pluck('name'); //para ver el error
 
         $validated = $request->validated();
 
@@ -108,7 +114,8 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        $user->syncRoles($request->roles);
+        // $user->syncRoles($request->roles);
+        $user->syncRoles($roleNames); //para ver el error
 
         return redirect()
             ->route('users.edit', $user)
@@ -133,4 +140,36 @@ class UserController extends Controller
     {
         return Excel::download(new UsersExport, 'users.xlsx');
     }
+
+    public function updatePermission(Request $request, User $user)
+    {
+        $user->update([
+            'permiso' => $request->permiso,
+        ]);
+
+        return response()->json(['message' => 'Permiso actualizado con éxito.']);
+    }
+
+    public function permiso()
+    {
+
+        //Asegurate de que el rol 'user existe
+        $roleUser = Role::where('name', 'user')->first();
+
+        //Verifica si el rol existe para evitar erroes en caso de que no exista
+        if($roleUser){
+            //recupera todos los usuarios cone ese rol
+            $users = User::role('user')->get();
+        } else {
+            // si no existe el rol 'user', devuelve una coleccion vacia
+            $users = collect([]);
+        }
+
+        // //Recupera todos los usuarios
+        // $users = User::all();
+
+        //Retorna la vista con el listado de usuarios, pasando los usuarios como variable
+        return view('app.users.permiso', compact('users'));
+    }
+
 }

@@ -22,6 +22,7 @@ class UsersImport implements ToModel, WithHeadingRow
                 'email'    => $row['email'],
                 'password' => Hash::make($row['password']),
                 'localidad' => $row['localidad'], // Asegúrate de que tu archivo Excel tenga una columna 'localidad'
+                'permiso' => $row['permiso'],
             ]);
         }
 
