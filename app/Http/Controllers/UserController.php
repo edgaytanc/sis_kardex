@@ -50,7 +50,8 @@ class UserController extends Controller
     public function store(UserStoreRequest $request): RedirectResponse
     {
         $this->authorize('create', User::class);
-        $roleNames = Role::whereIn('id',$request->roles)->pluck('name');  //prueba de error
+        // $roleNames = Role::whereIn('id',$request->roles)->pluck('name');  //prueba de error
+        $roleNames = Role::whereIn('id', $request->roles ?? [])->pluck('name');
 
         $validated = $request->validated();
 
@@ -100,7 +101,9 @@ class UserController extends Controller
 
         $this->authorize('update', $user);
 
-        $roleNames = Role::whereIn('id', $request->roles)->pluck('name'); //para ver el error
+        // $roleNames = Role::whereIn('id', $request->roles)->pluck('name'); //para ver el error
+        $roleNames = Role::whereIn('id', $request->roles ?? [])->pluck('name');
+
 
         $validated = $request->validated();
 

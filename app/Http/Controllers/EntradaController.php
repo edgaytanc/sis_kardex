@@ -16,6 +16,11 @@ use Carbon\Carbon;
 
 class EntradaController extends Controller
 {
+
+
+
+
+
     /**
      * Display a listing of the resource.
      */
@@ -25,10 +30,19 @@ class EntradaController extends Controller
 
         $search = $request->get('search', '');
 
-        $entradas = Entrada::search($search)
-            ->latest()
+        if (empty($search)) {
+            $entradas = Entrada::query();
+        } else {
+            $entradas = Entrada::search($search);
+        }
+
+        $entradas = $entradas->latest()
             ->paginate(5)
             ->withQueryString();
+        // $entradas = Entrada::search($search)
+        //     ->latest()
+        //     ->paginate(5)
+        //     ->withQueryString();
 
         return view('app.entradas.index', compact('entradas', 'search'));
     }
@@ -138,6 +152,21 @@ class EntradaController extends Controller
         Request $request,
         Entrada $entrada
     ): RedirectResponse {
+
+        $user = auth()->user();
+        $permiso =$user->permiso;
+        $isSuperAdmin = $user->hasRole('super-admin');
+
+        if (!$isSuperAdmin && $permiso==0) {
+            $fechaEntrada = Carbon::parse($entrada->fecha);
+            $fechaLimite = Carbon::now()->subMonth();
+
+            if ($fechaEntrada->lt($fechaLimite)) {
+                return redirect()->route('entradas.index')->with('error', 'No puedes eliminar registros con más de un mes de antigüedad.');
+            }
+        }
+
+
         $this->authorize('delete', $entrada);
 
         $entrada->delete();

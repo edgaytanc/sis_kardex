@@ -232,6 +232,21 @@ class SalidaController extends Controller
      */
     public function destroy(Request $request, Salida $salida): RedirectResponse
     {
+
+        $user = auth()->user();
+        $permiso =$user->permiso;
+        $isSuperAdmin = $user->hasRole('super-admin');
+
+        // Añadir restricción basada en la fecha para usuarios que no son super-admin
+        if (!$isSuperAdmin && $permiso==0) {
+            $fechaSalida = Carbon::parse($salida->fecha);
+            $fechaLimite = Carbon::now()->subMonth();
+
+            if ($fechaSalida->lt($fechaLimite)) {
+                return redirect()->route('salidas.index')->with('error', 'No puedes elimniar registros con más de un mes de antigüedad.');
+            }
+        }
+
         $this->authorize('delete', $salida);
 
         $salida->delete();

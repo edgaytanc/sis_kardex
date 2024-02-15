@@ -158,7 +158,7 @@
                         <li class="nav-item">
                             <a href="{{ route('permissions.index') }}" class="nav-link">
                                 <i class="nav-icon icon ion-md-radio-button-off"></i>
-                                <p>Permissions</p>
+                                <p>Permisos</p>
                             </a>
                         </li>
                         @endcan

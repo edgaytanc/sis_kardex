@@ -26,6 +26,7 @@ class Entrada extends Model
         'precio',
     ];
 
+    protected $searchEntradaRelations = true;
     protected $searchableFields = ['*'];
 
     protected $casts = [

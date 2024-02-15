@@ -43,21 +43,34 @@ class ConsultaController extends Controller
             ->value('precio_unitario');
 
             $datos = DB::select("
-            SELECT *
+            SELECT
+                DATE_FORMAT(datos.FechaOriginal, '%d/%m/%Y') AS Fecha,
+                datos.Numero_de_referencia,
+                datos.Remitente_Destinatario,
+                datos.Cantidad_Entrada,
+                datos.Precio_Unitario,
+                datos.Valor_Total,
+                DATE_FORMAT(datos.Fecha_vencimiento_original, '%d/%m/%Y') AS Fecha_vencimiento,
+                datos.Numero_Lote,
+                datos.Cantidad_Salida,
+                datos.Reajuste,
+                datos.Cantidad_Total,
+                datos.Precio
             FROM (
                 SELECT
-                    DATE_FORMAT(e.fecha, '%d/%m/%Y') AS Fecha,
+                    e.fecha AS FechaOriginal,
                     e.numero_referencia AS Numero_de_referencia,
                     rem.nombre AS Remitente_Destinatario,
                     e.cantidad AS Cantidad_Entrada,
                     e.precio_unitario AS Precio_Unitario,
                     (e.cantidad * e.precio_unitario) AS Valor_Total,
-                    DATE_FORMAT(e.fecha_vencimiento, '%d/%m/%Y') AS Fecha_vencimiento,
+                    e.fecha_vencimiento AS Fecha_vencimiento_original,
                     e.numero_lote AS Numero_Lote,
                     NULL AS Cantidad_Salida,
                     e.reajuste_positivo AS Reajuste,
-                    e.cantidad As Cantidad_Total,
-                    e.precio As Precio
+                    e.cantidad AS Cantidad_Total,
+                    e.precio AS Precio,
+                    e.id AS OrdenInsercion -- Asumiendo 'id' es autoincrementable y refleja el orden de inserción
                 FROM
                     entradas e
                 LEFT JOIN
@@ -68,18 +81,19 @@ class ConsultaController extends Controller
                 UNION ALL
 
                 SELECT
-                    DATE_FORMAT(s.fecha, '%d/%m/%Y') AS Fecha,
+                    s.fecha AS FechaOriginal,
                     s.numero_referencia AS Numero_de_referencia,
                     des.nombre AS Remitente_Destinatario,
                     NULL AS Cantidad_Entrada,
                     s.precio_unitario AS Precio_Unitario,
                     NULL AS Valor_Total,
-                    DATE_FORMAT(s.fecha_vencimiento, '%d/%m/%Y') AS Fecha_vencimiento,
+                    s.fecha_vencimiento AS Fecha_vencimiento_original,
                     s.lote_salida AS Numero_Lote,
                     s.cantidad_salida AS Cantidad_Salida,
                     s.reajuste_negativo AS Reajuste,
                     s.cantidad_actual AS Cantidad_Total,
-                    s.precio AS Precio
+                    s.precio AS Precio,
+                    s.id AS OrdenInsercion
                 FROM
                     salidas s
                 LEFT JOIN
@@ -87,7 +101,8 @@ class ConsultaController extends Controller
                 WHERE
                     s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
             ) AS datos
-            ORDER BY STR_TO_DATE(Fecha, '%d/%m/%Y') ASC
+            ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
+
         ", [
             'productoIdEntrada' => $productoId,
             'userIdEntrada' => $userId,
@@ -128,21 +143,34 @@ class ConsultaController extends Controller
         // $userId = auth()->user()->id;
 
         $datos = DB::select("
-            SELECT *
+            SELECT
+                DATE_FORMAT(datos.FechaOriginal, '%d/%m/%Y') AS Fecha,
+                datos.Numero_de_referencia,
+                datos.Remitente_Destinatario,
+                datos.Cantidad_Entrada,
+                datos.Precio_Unitario,
+                datos.Valor_Total,
+                DATE_FORMAT(datos.Fecha_vencimiento_original, '%d/%m/%Y') AS Fecha_vencimiento,
+                datos.Numero_Lote,
+                datos.Cantidad_Salida,
+                datos.Reajuste,
+                datos.Cantidad_Total,
+                datos.Precio
             FROM (
                 SELECT
-                    DATE_FORMAT(e.fecha, '%d/%m/%Y') AS Fecha,
+                    e.fecha AS FechaOriginal,
                     e.numero_referencia AS Numero_de_referencia,
                     rem.nombre AS Remitente_Destinatario,
                     e.cantidad AS Cantidad_Entrada,
                     e.precio_unitario AS Precio_Unitario,
                     (e.cantidad * e.precio_unitario) AS Valor_Total,
-                    DATE_FORMAT(e.fecha_vencimiento, '%d/%m/%Y') AS Fecha_vencimiento,
+                    e.fecha_vencimiento AS Fecha_vencimiento_original,
                     e.numero_lote AS Numero_Lote,
                     NULL AS Cantidad_Salida,
                     e.reajuste_positivo AS Reajuste,
-                    e.cantidad As Cantidad_Total,
-                    e.precio As Precio
+                    e.cantidad AS Cantidad_Total,
+                    e.precio AS Precio,
+                    e.id AS OrdenInsercion -- Asumiendo 'id' es autoincrementable y refleja el orden de inserción
                 FROM
                     entradas e
                 LEFT JOIN
@@ -153,18 +181,19 @@ class ConsultaController extends Controller
                 UNION ALL
 
                 SELECT
-                    DATE_FORMAT(s.fecha, '%d/%m/%Y') AS Fecha,
+                    s.fecha AS FechaOriginal,
                     s.numero_referencia AS Numero_de_referencia,
                     des.nombre AS Remitente_Destinatario,
                     NULL AS Cantidad_Entrada,
                     s.precio_unitario AS Precio_Unitario,
                     NULL AS Valor_Total,
-                    DATE_FORMAT(s.fecha_vencimiento, '%d/%m/%Y') AS Fecha_vencimiento,
+                    s.fecha_vencimiento AS Fecha_vencimiento_original,
                     s.lote_salida AS Numero_Lote,
                     s.cantidad_salida AS Cantidad_Salida,
                     s.reajuste_negativo AS Reajuste,
                     s.cantidad_actual AS Cantidad_Total,
-                    s.precio AS Precio
+                    s.precio AS Precio,
+                    s.id AS OrdenInsercion
                 FROM
                     salidas s
                 LEFT JOIN
@@ -172,7 +201,8 @@ class ConsultaController extends Controller
                 WHERE
                     s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
             ) AS datos
-            ORDER BY STR_TO_DATE(Fecha, '%d/%m/%Y') ASC
+            ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
+
         ", [
             'productoIdEntrada' => $productoId,
             'userIdEntrada' => $userId,

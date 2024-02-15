@@ -24,15 +24,39 @@ trait Searchable
      * Adds a scope to search the table based on the
      * $searchableFields array inside the model
      */
+    // public function scopeSearch(Builder $query, string $search): Builder
+    // {
+    //     $query->where(function ($query) use ($search) {
+    //         foreach ($this->getSearchableFields() as $field) {
+    //             $query->orWhere($field, 'like', "%{$search}%");
+    //         }
+    //     });
+
+    //     return $query;
+    // }
+
     public function scopeSearch(Builder $query, string $search): Builder
     {
-        $query->where(function ($query) use ($search) {
+        if (empty($search)) {
+            return $query;
+        }
+
+        return $query->where(function ($query) use ($search) {
+            // Búsqueda específica para el modelo Entrada
+            if (isset($this->searchEntradaRelations) && $this->searchEntradaRelations === true) {
+                $query->orWhereHas('producto', function ($subQuery) use ($search) {
+                    $subQuery->where('nombre', 'like', "%{$search}%");
+                });
+            }
+
+            // Búsqueda en campos locales definidos en $searchableFields o en todos si '*' está presente
             foreach ($this->getSearchableFields() as $field) {
+                if ($field === '*') {
+                    continue; // Omitir, la lógica para manejar '*' debe ser implementada si es necesario
+                }
                 $query->orWhere($field, 'like', "%{$search}%");
             }
         });
-
-        return $query;
     }
 
     /**
