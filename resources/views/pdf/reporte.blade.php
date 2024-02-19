@@ -6,15 +6,16 @@
     <style>
         body {
             font-family: 'Tw Cen MT';
-            font-size: 11px;
+            font-size: 9px;
             margin: 0;
+            padding-top: 4cm;
         }
         .footer {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            font-size: 11px;
+            font-size: 9px;
             text-align: center;
         }
         table {
@@ -23,7 +24,7 @@
         }
         th, td {
             border: 1px solid black;
-            padding: 8px;
+            padding: 7px;
             text-align: left;
         }
         th {
@@ -39,15 +40,24 @@
     $cantidadTotalVienen = null;
     $precioVienen = null;
 @endphp
-@foreach(array_chunk($datos, 18) as $pagina => $bloqueDatos)
+@foreach(array_chunk($datos, 15) as $pagina => $bloqueDatos)
     @if($pagina > 0)
         <div style="page-break-before: always;"></div>
     @endif
-    <h4>MINISTERIO DE SALUD PUBLICA Y ASISTENCIA SOCIAL<BR>
-        DIRECCION DEPARTAMENTAL DE REDES INTEGRADAS DE SERVICIOS DE SALUD DE TOTONICAPAN<BR>
-        DEPENDENCIA: {{$localidad}} <BR>
-        PRODUCTO: {{ $nombreProducto }}
-    </h4>
+    <div style="display: table; width: 100%;">
+        <div style="display: table-cell; width: 80%;">
+            <h4 style="margin: 0;">
+                MINISTERIO DE SALUD PUBLICA Y ASISTENCIA SOCIAL<br>
+                DIRECCION DEPARTAMENTAL DE REDES INTEGRADAS DE SERVICIOS DE SALUD DE TOTONICAPAN<br>
+                DEPENDENCIA: {{ $localidad }}<br>
+                PRODUCTO: {{ $nombreProducto }}
+            </h4>
+        </div>
+        <div style="display: table-cell; vertical-align: top; text-align: right;">
+            <img src="{{ public_path('images/nivel_seguridad.png') }}" style="height: 100px;" alt="Niveles de Seguridad">
+        </div>
+    </div>
+
     <table>
         <thead>
             <tr>

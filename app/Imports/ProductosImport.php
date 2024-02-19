@@ -31,13 +31,14 @@ class ProductosImport implements ToModel, WithHeadingRow
             return null;
         } else{
             return new Producto([
-                'categoria'      => $row[0],
-                'nombre'         => $row[1],
-                'presentacion'   => $row[2],
-                'concentracion'  => $row[3],
-                'envase'         => $row[4],
-                'unidad_medida'  => $row[5],
+                'categoria'      => $row['categoria'],
+                'nombre'         => $row['nombre'],
+                'presentacion'   => $row['presentacion'],
+                'concentracion'  => $row['concentracion'],
+                'envase'         => $row['envase'],
+                'unidad_medida'  => $row['unidad_medida'],
             ]);
+
         }
 
 
