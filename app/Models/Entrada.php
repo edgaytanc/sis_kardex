@@ -18,12 +18,13 @@ class Entrada extends Model
         'cantidad',
         'precio_unitario',
         'fecha_vencimiento',
-        'remitente_id',
+        'remitente',
         'numero_lote',
         'reajuste_positivo',
         'id_user',
         'cantidad_actual',
         'precio',
+        'observaciones',
     ];
 
     protected $searchEntradaRelations = true;
@@ -34,10 +35,6 @@ class Entrada extends Model
         'fecha_vencimiento' => 'date',
     ];
 
-    public function remitente()
-    {
-        return $this->belongsTo(Remitente::class);
-    }
 
     public function producto()
     {

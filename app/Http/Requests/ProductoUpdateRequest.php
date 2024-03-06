@@ -22,7 +22,7 @@ class ProductoUpdateRequest extends FormRequest
         return [
             'categoria' => [
                 'required',
-                'in:Medicamento,Equipo quirurgico,Suministros',
+                'in:Medicamento,Equipo quirurgico,Suministros,Vacuna',
             ],
             'nombre' => ['required', 'max:255', 'string'],
             'presentacion' => ['nullable', 'max:255', 'string'],

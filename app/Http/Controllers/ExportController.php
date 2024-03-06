@@ -25,14 +25,6 @@ class ExportController extends Controller
         ]);
     }
 
-    // public function index_destinatarios()
-    // {
-    //     return view('app..exports.destinatarios',[
-    //         'destinatarios' => Destinatario::paginate()
-    //     ]);
-    // }
-
-
     //Exportaciones
 
     public function users()

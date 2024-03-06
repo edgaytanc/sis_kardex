@@ -7,6 +7,7 @@
             <option value="Medicamento" {{ $selected == 'Medicamento' ? 'selected' : '' }} >Medicamento</option>
             <option value="Equipo quirurgico" {{ $selected == 'Equipo quirurgico' ? 'selected' : '' }} >Equipo quirurgico</option>
             <option value="Suministros" {{ $selected == 'Suministros' ? 'selected' : '' }} >Suministros</option>
+            <option value="Vacuna" {{ $selected == 'Vacuna' ? 'selected' : '' }} >Vacuna</option>
         </x-inputs.select>
     </x-inputs.group>
 

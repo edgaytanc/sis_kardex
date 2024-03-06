@@ -2,7 +2,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{ url('/home') }}" class="brand-link">
-        <img src="https://vemto.app/favicon.png" alt="Vemto Logo" class="brand-image bg-white img-circle">
+        <img src="images\LogoMSP.png" alt="Kardex" class="brand-image bg-white img-rounded">
         {{-- <span class="brand-text font-weight-light">{{auth()->user()->localidad}}</span> --}}
     </a>
 
@@ -18,7 +18,7 @@
                     <a href="{{ route('home') }}" class="nav-link">
                         <i class="nav-icon icon ion-md-pulse"></i>
                         <p>
-                            Dashboard
+                            Tablero
                         </p>
                     </a>
                 </li>
@@ -29,7 +29,7 @@
                             <a href="{{ route('export.index') }}" class="nav-link">
                                 <i class="nav-icon icon ion-md-pulse"></i>
                                 <p>
-                                    Import/Export
+                                    Importar / Exportar
                                 </p>
                             </a>
                         </li>
@@ -41,19 +41,12 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon icon ion-md-apps"></i>
                         <p>
-                            Apps
+                            Menú
                             <i class="nav-icon right icon ion-md-arrow-round-back"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-                            @can('view-any', App\Models\User::class)
-                            <li class="nav-item">
-                                <a href="{{ route('users.index') }}" class="nav-link">
-                                    <i class="nav-icon icon ion-md-radio-button-off"></i>
-                                    <p>Users</p>
-                                </a>
-                            </li>
-                            @endcan
+
                             @can('view-any', App\Models\Producto::class)
                             <li class="nav-item">
                                 <a href="{{ route('productos.index') }}" class="nav-link">
@@ -140,11 +133,20 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon icon ion-md-key"></i>
                         <p>
-                            Access Management
+                            Administración
                             <i class="nav-icon right icon ion-md-arrow-round-back"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @can('view-any', App\Models\User::class)
+                        <li class="nav-item">
+                             <a href="{{ route('users.index') }}" class="nav-link">
+                                <i class="nav-icon icon ion-md-radio-button-off"></i>
+                                <p>Usuarios</p>
+                            </a>
+                        </li>
+                        @endcan
+
                         @can('view-any', Spatie\Permission\Models\Role::class)
                         <li class="nav-item">
                             <a href="{{ route('roles.index') }}" class="nav-link">
@@ -182,7 +184,7 @@
                             <a href="{{route('select_user')}}" class="nav-link">
                                 <i class="nav-icon icon ion-md-key"></i>
                                 <p>
-                                    Control Management
+                                    Control de Puestos
                                     {{-- <i class="nav-icon right icon ion-md-arrow-round-back"></i> --}}
                                 </p>
                             </a>
@@ -192,9 +194,9 @@
                 @endauth
 
                 <li class="nav-item">
-                    <a href="https://adminlte.io/docs/3.1//index.html" target="_blank" class="nav-link">
+                    <a href="https://establecimientosdesalud.mspas.gob.gt/" target="_blank" class="nav-link">
                         <i class="nav-icon icon ion-md-help-circle-outline"></i>
-                        <p>Docs</p>
+                        <p>Establecimientos</p>
                     </a>
                 </li>
 
@@ -202,7 +204,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="nav-icon icon ion-md-exit"></i>
-                        <p>{{ __('Logout') }}</p>
+                        <p>{{ __('Cerrar Sesión') }}</p>
                     </a>
 
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

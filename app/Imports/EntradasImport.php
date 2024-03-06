@@ -6,6 +6,8 @@ use App\Models\Entrada;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Illuminate\Support\Facades\Log;
+
 
 class EntradasImport implements ToModel, WithHeadingRow
 {
@@ -13,8 +15,17 @@ class EntradasImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        // Verificar si existe un registro con el ID proporcionado.
+
+        if(!isset($row['id'])){
+            log::warning("Fila omitida debido a la falta de la clave 'id': ". json_encode($row));
+            return null;
+        }
+        else{
+            // Verificar si existe un registro con el ID proporcionado.
         $entrada = Entrada::find($row['id']);
+        }
+
+
 
         if ($entrada) {
             // Actualizar el registro existente.
@@ -25,12 +36,13 @@ class EntradasImport implements ToModel, WithHeadingRow
                 'cantidad' => $row['cantidad'],
                 'precio_unitario' => $row['precio_unitario'],
                 'fecha_vencimiento' => $row['fecha_vencimiento'],
-                'remitente_id' => $row['remitente_id'],
+                'remitente' => $row['remitente'],
                 'numero_lote' => $row['numero_lote'],
                 'reajuste_positivo' => $row['reajuste_positivo'],
                 'id_user' => $row['id_user'],
                 'cantidad_actual' => $row['cantidad_actual'],
                 'precio' => $row['precio'],
+                'observaciones' => $row['observaciones'],
             ]);
             return null; // Retorna null para no crear un nuevo modelo
         } else {
@@ -43,12 +55,13 @@ class EntradasImport implements ToModel, WithHeadingRow
                 'cantidad' => $row['cantidad'],
                 'precio_unitario' => $row['precio_unitario'],
                 'fecha_vencimiento' => $row['fecha_vencimiento'],
-                'remitente_id' => $row['remitente_id'],
+                'remitente' => $row['remitente'],
                 'numero_lote' => $row['numero_lote'],
                 'reajuste_positivo' => $row['reajuste_positivo'],
                 'id_user' => $row['id_user'],
                 'cantidad_actual' => $row['cantidad_actual'],
                 'precio' => $row['precio'],
+                'observaciones' => $row['observaciones'],
             ]);
         }
     }

@@ -39,10 +39,6 @@ class EntradaController extends Controller
         $entradas = $entradas->latest()
             ->paginate(5)
             ->withQueryString();
-        // $entradas = Entrada::search($search)
-        //     ->latest()
-        //     ->paginate(5)
-        //     ->withQueryString();
 
         return view('app.entradas.index', compact('entradas', 'search'));
     }
@@ -74,13 +70,18 @@ class EntradaController extends Controller
         $validated['cantidad_actual'] = $validated['cantidad'];
         $validated['precio'] = $validated['cantidad'] * $validated['precio_unitario'];
 
+        // Verificar si hay reajuste positivo y ajustar la cantidad actual en consecuencia
+        $reajustePositivo = $validated['reajuste_positivo'] ?? 0;
+        if ($reajustePositivo > 0) {
+            $validated['cantidad_actual'] += $reajustePositivo;
+        }
+
         $entrada = Entrada::create($validated);
 
         return redirect()
             ->route('entradas.edit', $entrada)
             ->withSuccess(__('crud.common.created'));
     }
-
     /**
      * Display the specified resource.
      */
@@ -133,9 +134,20 @@ class EntradaController extends Controller
         $validated = $request->validated();
         $validated['id_user'] = Auth::id();
 
+        // Recuperar el registro de entrada actual por ID para obtener la cantidad_actual
+        $entradaActual = Entrada::find($entrada->id);
+
         // Asignar el valor de cantidad a cantidad_actual solo si se proporciona cantidad
+        // if (isset($validated['cantidad'])) {
+        //     $validated['cantidad_actual'] = $validated['cantidad'];
+        // }
+
         if (isset($validated['cantidad'])) {
-            $validated['cantidad_actual'] = $validated['cantidad'];
+            // Calcular la diferencia entre la cantidad antigua y la nueva
+            $diferencia = $validated['cantidad'] - $entradaActual->cantidad;
+
+            // Ajustar cantidad_actual basado en la diferencia calculada
+            $validated['cantidad_actual'] = $entradaActual->cantidad_actual + $diferencia;
         }
 
         $entrada->update($validated);

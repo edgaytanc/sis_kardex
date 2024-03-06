@@ -37,12 +37,13 @@
                                 <tr>
                                     <td class="d-none">{{$entrada->id ?? '-' }}</td>
                                     <td class="px-1">{{ optional($entrada->producto)->nombre ?? '-' }}</td>
-                                    <td>{{ $entrada->cantidad ?? '-' }}</td>
-                                    <td>{{ $entrada->fecha_vencimiento->format('d-m-Y') ?? '-' }}</td>
-                                    <td>{{ $entrada->numero_lote ?? '-' }}</td>
+                                    <td>{{ $entrada->cantidad_actual ?? '-' }}</td>
+                                    <td>{{ $entrada->fecha_vencimiento ? \Carbon\Carbon::parse($entrada->fecha_vencimiento)->format('d-m-Y') : '-' }}</td>
+                                        <td>{{ $entrada->numero_lote ?? '-' }}</td>
                                     <td class="text-center px-1" style="width: 134px;">
                                         <div role="group" aria-label="Row Actions" class="btn-group">
-                                            <button type="button" class="btn btn-success" onclick="selectProduct('{{ $entrada->id }}', '{{ $entrada->producto->nombre }}', '{{ $entrada->numero_lote }}', '{{ $entrada->fecha_vencimiento->format('d-m-Y') }}')" style="white-space: nowrap;">
+                                        <button type="button" class="btn btn-success" onclick="selectProduct('{{ $entrada->id }}', '{{ $entrada->producto->nombre }}', '{{ $entrada->numero_lote }}', '{{ $entrada->fecha_vencimiento ? \Carbon\Carbon::parse($entrada->fecha_vencimiento)->format('d-m-Y') : '-' }}')">
+
                                                 <i class="icon ion-md-checkmark"></i> Seleccionar
                                             </button>
                                         </div>
@@ -89,19 +90,21 @@
 
 <!-- Script JavaScript para manejar la selección del producto -->
 <script>
-    function selectProduct(entradaId, nombre, lote, fechaVencimiento) {
+function selectProduct(entradaId, nombre, lote, fechaVencimiento) {
     document.getElementById('entrada_id').value = entradaId;
     document.getElementById('nombre_producto').value = nombre;
     document.getElementById('lote_salida').value = lote;
-    console.log("Entrada Id: " + document.getElementById('entrada_id').value);
 
+    // Verificar si la fecha de vencimiento no es nula antes de formatearla
+    if (fechaVencimiento) {
         // Convierte la fecha de vencimiento al formato "Y-m-d" para el input de tipo date
         var formattedFechaVencimiento = formatDate(fechaVencimiento);
         document.getElementById('fecha_vencimiento').value = formattedFechaVencimiento;
-
-        // Envía el formulario automáticamente al seleccionar el producto
-        document.getElementById('selectedProductForm').submit();
     }
+
+    // Envía el formulario automáticamente al seleccionar el producto
+    document.getElementById('selectedProductForm').submit();
+}
 
     // Función para formatear la fecha al formato "Y-m-d"
     function formatDate(dateString) {

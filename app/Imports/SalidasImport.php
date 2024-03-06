@@ -27,7 +27,7 @@ class SalidasImport implements ToModel, WithHeadingRow
                 'nombre_producto' => $row['nombre_producto'],
                 'fecha' => $row['fecha'],
                 'numero_referencia' => $row['numero_referencia'],
-                'destinatario_id' => $row['destinatario_id'],
+                'destinatario' => $row['destinatario'],
                 'fecha_vencimiento' => $row['fecha_vencimiento'],
                 'lote_salida' => $row['lote_salida'],
                 'cantidad_salida' => $row['cantidad_salida'],
@@ -36,6 +36,7 @@ class SalidasImport implements ToModel, WithHeadingRow
                 'cantidad_actual' => $row['cantidad_actual'],
                 'precio' => $row['precio'],
                 'precio_unitario' => $row['precio_unitario'],
+                'observaciones' => $row['observaciones'],
             ]);
             return null; // retorna new para no crear un nuevo modelo
 
@@ -46,7 +47,7 @@ class SalidasImport implements ToModel, WithHeadingRow
                 'nombre_producto' => $row['nombre_producto'],
                 'fecha' => $row['fecha'],
                 'numero_referencia' => $row['numero_referencia'],
-                'destinatario_id' => $row['destinatario_id'],
+                'destinatario' => $row['destinatario'],
                 'fecha_vencimiento' => $row['fecha_vencimiento'],
                 'lote_salida' => $row['lote_salida'],
                 'cantidad_salida' => $row['cantidad_salida'],
@@ -55,6 +56,7 @@ class SalidasImport implements ToModel, WithHeadingRow
                 'cantidad_actual' => $row['cantidad_actual'],
                 'precio' => $row['precio'],
                 'precio_unitario' => $row['precio_unitario'],
+                'observaciones' => $row['observaciones'],
             ]);
         }
     }

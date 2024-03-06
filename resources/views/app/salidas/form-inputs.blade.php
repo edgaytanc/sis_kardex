@@ -48,23 +48,26 @@
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12 col-lg-6">
-        <x-inputs.select name="destinatario_id" label="Destinatario" required>
-            @php $selected = old('destinatario_id', ($editing ? $salida->destinatario_id : '')) @endphp
-            <option disabled {{ empty($selected) ? 'selected' : '' }}>Please select the Destinatario</option>
-            @foreach($destinatarios as $value => $label)
-            <option value="{{ $value }}" {{ $selected == $value ? 'selected' : '' }} >{{ $label }}</option>
-            @endforeach
+        <x-inputs.text
+            name="destinatario"
+            label="Destinatario"
+            :value="old('destinatario', ($editing ? $salida->destinatario : ''))"
+            maxlength="200"
+            placeholder="destinatario"
+            required>
         </x-inputs.select>
-    </x-inputs.group>
+</x-inputs.group>
 
-    <x-inputs.group class="col-sm-12 col-lg-6">
-        <x-inputs.date
-            name="fecha_vencimiento"
-            label="Fecha Vencimiento"
-            value="{{ old('fecha_vencimiento', ($editing ? optional($salida->fecha_vencimiento)->format('Y-m-d') : '')) }}"
-            max="255"
-        ></x-inputs.date>
-    </x-inputs.group>
+
+<x-inputs.group class="col-sm-12 col-lg-6">
+    <x-inputs.date
+        name="fecha_vencimiento"
+        label="Fecha Vencimiento"
+        :value="old('fecha_vencimiento', ($editing && $salida->fecha_vencimiento ? optional($salida->fecha_vencimiento)->format('Y-m-d') : null))"
+        max="255"
+        null-option="true"
+    ></x-inputs.date>
+</x-inputs.group>
 
     <x-inputs.group class="col-sm-12 col-lg-4">
         <x-inputs.text
@@ -81,7 +84,8 @@
             name="cantidad_salida"
             label="Cantidad Salida"
             :value="old('cantidad_salida', ($editing ? $salida->cantidad_salida : ''))"
-            max="255"
+            max="10000000"
+            step="0.01"
             placeholder="Cantidad Salida"
             :max="isset($cantidadDisponible) ? $cantidadDisponible : 0"
         ></x-inputs.number>
@@ -92,9 +96,20 @@
             name="reajuste_negativo"
             label="Reajuste Negativo"
             :value="old('reajuste_negativo', ($editing ? $salida->reajuste_negativo : ''))"
-            max="255"
+            max="10000000"
+            step="0.01"
             placeholder="Reajuste Negativo"
         ></x-inputs.number>
     </x-inputs.group>
 
+    <x-inputs.group class="col-sm-12 col-lg-6">
+        <x-inputs.textarea
+            name="observaciones"
+            label="Observaciones"
+            :value="old('observaciones', ($editing ? $salida->observaciones : ''))"
+            rows="4"
+            placeholder="Observaciones"
+        ></x-inputs.textarea>
+    </x-inputs.group>
 </div>
+

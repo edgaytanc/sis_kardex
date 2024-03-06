@@ -16,7 +16,7 @@ class Salida extends Model
         'nombre_producto',
         'fecha',
         'numero_referencia',
-        'destinatario_id',
+        'destinatario',
         'fecha_vencimiento',
         'lote_salida',
         'cantidad_salida',
@@ -25,6 +25,7 @@ class Salida extends Model
         'precio_unitario',
         'cantidad_actual',
         'precio',
+        'observaciones',
     ];
 
     protected $searchableFields = ['*'];
@@ -33,11 +34,6 @@ class Salida extends Model
         'fecha' => 'date',
         'fecha_vencimiento' => 'date',
     ];
-
-    public function destinatario()
-    {
-        return $this->belongsTo(Destinatario::class);
-    }
 
     public function entrada()
     {
@@ -53,10 +49,12 @@ class Salida extends Model
     {
         return $this->entrada->numero_lote ?? null;
     }
+
     public function producto_id()
     {
         return $this->entrada->producto_id ?? null;
     }
+
     public function getCantidadDisponible($lote)
     {
         return $this->where('numero_lote', $lote)->sum('cantidad');

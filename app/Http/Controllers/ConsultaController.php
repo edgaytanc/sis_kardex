@@ -37,83 +37,94 @@ class ConsultaController extends Controller
 
         // Obtiene el último precio unitario no NULL para usarlo como valor predeterminado
         $precio_unitario = DB::table('entradas')
+
             ->where('cantidad_actual', '>', 0)
             ->whereNotNull('precio_unitario')
             ->orderByDesc('fecha')
             ->value('precio_unitario');
+            DB::statement("SET @saldo_acumulado := 0;");
+            DB::statement("SET @precio_acumulado := 0;");
+            DB::statement("SET @valor_total_acumulado:=0;");
 
-
-
-            // Inicializa la variable @saldo_acumulado
-        DB::statement("SET @saldo_acumulado := 0;");
-        DB::statement("SET @precio_acumulado := 0;");
-
-        $datos = DB::select("
-        SELECT
-            DATE_FORMAT(datos.FechaOriginal, '%d/%m/%Y') AS Fecha,
-            datos.Numero_de_referencia,
-            datos.Remitente_Destinatario,
-            datos.Cantidad_Entrada,
-            datos.Precio_Unitario,
-            datos.Valor_Total,
-            DATE_FORMAT(datos.Fecha_vencimiento_original, '%d/%m/%Y') AS Fecha_vencimiento,
-            datos.Numero_Lote,
-            datos.Cantidad_Salida,
-            datos.Reajuste,
-            @saldo_acumulado := @saldo_acumulado + COALESCE(datos.Cantidad_Entrada, 0) - COALESCE(datos.Cantidad_Salida, 0) AS Cantidad_Total,
-            datos.Precio
-        FROM (
+            $datos = DB::select("
             SELECT
-                e.fecha AS FechaOriginal,
-                e.numero_referencia AS Numero_de_referencia,
-                rem.nombre AS Remitente_Destinatario,
-                e.cantidad AS Cantidad_Entrada,
-                e.precio_unitario AS Precio_Unitario,
-                (e.cantidad * e.precio_unitario) AS Valor_Total,
-                e.fecha_vencimiento AS Fecha_vencimiento_original,
-                e.numero_lote AS Numero_Lote,
-                NULL AS Cantidad_Salida,
-                e.reajuste_positivo AS Reajuste,
-                e.cantidad AS Cantidad_Total,
-                e.precio AS Precio,
-                e.id AS OrdenInsercion
-            FROM
-                entradas e
-            LEFT JOIN
-                remitentes rem ON e.remitente_id = rem.id
-            WHERE
-                e.producto_id = :productoIdEntrada AND e.id_user = :userIdEntrada
+                DATE_FORMAT(datos.FechaOriginal, '%d/%m/%Y') AS Fecha,
+                datos.Numero_de_referencia,
+                datos.Remitente_Destinatario,
+                datos.Cantidad_Entrada,
+                datos.Precio_Unitario,
+                datos.Valor_Total,
+                DATE_FORMAT(datos.Fecha_vencimiento_original, '%d/%m/%Y') AS Fecha_vencimiento,
+                datos.Numero_Lote,
+                datos.Cantidad_Salida,
+                datos.Reajuste,
+                datos.Observaciones,
 
-            UNION ALL
+                @saldo_acumulado := @saldo_acumulado + COALESCE(datos.Cantidad_Entrada, 0) - COALESCE(datos.Cantidad_Salida, 0) + COALESCE(datos.Reajuste, 0) AS Cantidad_Total,
+                @precio_acumulado := CASE
+                    WHEN COALESCE(datos.Cantidad_Entrada, 0) > 0 THEN @precio_acumulado + (COALESCE(datos.Valor_Total, 0))
+                    WHEN COALESCE(datos.Reajuste, 0) <> 0 THEN @precio_acumulado + (COALESCE(datos.Reajuste,0) * COALESCE(datos.Precio_Unitario, 0))
+                    WHEN COALESCE(datos.Cantidad_Salida, 0) > 0 THEN
+                        CASE
+                            WHEN COALESCE(datos.Reajuste, 0) > 0 THEN @precio_acumulado - ((COALESCE(datos.Cantidad_Salida, 0) - COALESCE(datos.Reajuste, 0)) * COALESCE(datos.Precio_Unitario, 0))
+                            WHEN COALESCE(datos.Reajuste, 0) < 0 THEN @precio_acumulado - (COALESCE(datos.Cantidad_Salida, 0) * COALESCE(datos.Precio_Unitario, 0))
 
-            SELECT
-                s.fecha AS FechaOriginal,
-                s.numero_referencia AS Numero_de_referencia,
-                des.nombre AS Remitente_Destinatario,
-                NULL AS Cantidad_Entrada,
-                s.precio_unitario AS Precio_Unitario,
-                NULL AS Valor_Total,
-                s.fecha_vencimiento AS Fecha_vencimiento_original,
-                s.lote_salida AS Numero_Lote,
-                s.cantidad_salida AS Cantidad_Salida,
-                s.reajuste_negativo AS Reajuste,
-                s.cantidad_actual AS Cantidad_Total,
-                s.precio AS Precio,
-                s.id AS OrdenInsercion
-            FROM
-                salidas s
-            LEFT JOIN
-                destinatarios des ON s.destinatario_id = des.id
-            WHERE
-                s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
-        ) AS datos
-        ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
-    ", [
-        'productoIdEntrada' => $productoId,
-        'userIdEntrada' => $userId,
-        'nombreProductoSalida' => $nombreProducto,
-        'userIdSalida' => $userId
-    ]);
+                            ELSE @precio_acumulado - (COALESCE(datos.Cantidad_Salida, 0) * COALESCE(datos.Precio_Unitario, 0))
+                        END
+                    ELSE @saldo_acumulado * COALESCE(datos.Precio_Unitario,0)
+                END AS Precio
+
+            FROM (
+                SELECT
+                    e.fecha AS FechaOriginal,
+                    e.numero_referencia AS Numero_de_referencia,
+                    e.remitente AS Remitente_Destinatario,
+                    e.cantidad AS Cantidad_Entrada,
+                    e.precio_unitario AS Precio_Unitario,
+                    (e.cantidad * e.precio_unitario) AS Valor_Total,
+                    e.fecha_vencimiento AS Fecha_vencimiento_original,
+                    e.numero_lote AS Numero_Lote,
+                    NULL AS Cantidad_Salida,
+                    e.reajuste_positivo AS Reajuste,
+                    e.cantidad AS Cantidad_Total,
+                    e.precio AS Precio,
+                    e.observaciones AS Observaciones,
+                    e.id AS OrdenInsercion
+                FROM
+                    entradas e
+                WHERE
+                    e.producto_id = :productoIdEntrada AND e.id_user = :userIdEntrada
+
+                UNION ALL
+
+                SELECT
+    s.fecha AS FechaOriginal,
+    s.numero_referencia AS Numero_de_referencia,
+    s.destinatario AS Remitente_Destinatario,
+    NULL AS Cantidad_Entrada,
+    (SELECT e.precio_unitario FROM entradas e WHERE e.numero_lote = s.lote_salida LIMIT 1) AS Precio_Unitario,
+    NULL AS Valor_Total,
+    s.fecha_vencimiento AS Fecha_vencimiento_original,
+    s.lote_salida AS Numero_Lote,
+    s.cantidad_salida AS Cantidad_Salida,
+    s.reajuste_negativo AS Reajuste,
+    s.cantidad_actual AS Cantidad_Total,
+    s.precio AS Precio,
+    s.observaciones AS Observaciones,
+    s.id AS OrdenInsercion
+FROM
+    salidas s
+WHERE
+    s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
+            ) AS datos
+            ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
+
+        ", [
+            'productoIdEntrada' => $productoId,
+            'userIdEntrada' => $userId,
+            'nombreProductoSalida' => $nombreProducto,
+            'userIdSalida' => $userId
+        ]);
 
         return view('app.consultas.mostrar_datos', compact('datos','nombreProducto','localidad','productoId','userId'));
     }
@@ -145,6 +156,7 @@ class ConsultaController extends Controller
 
         // Inicializa la variable @saldo_acumulado
         DB::statement("SET @saldo_acumulado := 0;");
+        DB::statement("SET @precio_acumulado := 0;");
 
         $datos = DB::select("
         SELECT
@@ -158,13 +170,27 @@ class ConsultaController extends Controller
             datos.Numero_Lote,
             datos.Cantidad_Salida,
             datos.Reajuste,
-            @saldo_acumulado := @saldo_acumulado + COALESCE(datos.Cantidad_Entrada, 0) - COALESCE(datos.Cantidad_Salida, 0) AS Cantidad_Total,
-            datos.Precio
+            datos.Observaciones,
+
+            @saldo_acumulado := @saldo_acumulado + COALESCE(datos.Cantidad_Entrada, 0) - COALESCE(datos.Cantidad_Salida, 0) + COALESCE(datos.Reajuste, 0) AS Cantidad_Total,
+                @precio_acumulado := CASE
+                    WHEN COALESCE(datos.Cantidad_Entrada, 0) > 0 THEN @precio_acumulado + (COALESCE(datos.Valor_Total, 0))
+                    WHEN COALESCE(datos.Reajuste, 0) <> 0 THEN @precio_acumulado + (COALESCE(datos.Reajuste,0) * COALESCE(datos.Precio_Unitario, 0))
+                    WHEN COALESCE(datos.Cantidad_Salida, 0) > 0 THEN
+                        CASE
+                            WHEN COALESCE(datos.Reajuste, 0) > 0 THEN @precio_acumulado - ((COALESCE(datos.Cantidad_Salida, 0) - COALESCE(datos.Reajuste, 0)) * COALESCE(datos.Precio_Unitario, 0))
+                            WHEN COALESCE(datos.Reajuste, 0) < 0 THEN @precio_acumulado - (COALESCE(datos.Cantidad_Salida, 0) * COALESCE(datos.Precio_Unitario, 0))
+
+                            ELSE @precio_acumulado - (COALESCE(datos.Cantidad_Salida, 0) * COALESCE(datos.Precio_Unitario, 0))
+                        END
+                    ELSE @saldo_acumulado * COALESCE(datos.Precio_Unitario,0)
+                END AS Precio
+
         FROM (
             SELECT
                 e.fecha AS FechaOriginal,
                 e.numero_referencia AS Numero_de_referencia,
-                rem.nombre AS Remitente_Destinatario,
+                e.remitente AS Remitente_Destinatario,
                 e.cantidad AS Cantidad_Entrada,
                 e.precio_unitario AS Precio_Unitario,
                 (e.cantidad * e.precio_unitario) AS Valor_Total,
@@ -174,36 +200,35 @@ class ConsultaController extends Controller
                 e.reajuste_positivo AS Reajuste,
                 e.cantidad AS Cantidad_Total,
                 e.precio AS Precio,
+                e.observaciones AS Observaciones,
                 e.id AS OrdenInsercion
             FROM
                 entradas e
-            LEFT JOIN
-                remitentes rem ON e.remitente_id = rem.id
             WHERE
                 e.producto_id = :productoIdEntrada AND e.id_user = :userIdEntrada
 
             UNION ALL
 
             SELECT
-                s.fecha AS FechaOriginal,
-                s.numero_referencia AS Numero_de_referencia,
-                des.nombre AS Remitente_Destinatario,
-                NULL AS Cantidad_Entrada,
-                s.precio_unitario AS Precio_Unitario,
-                NULL AS Valor_Total,
-                s.fecha_vencimiento AS Fecha_vencimiento_original,
-                s.lote_salida AS Numero_Lote,
-                s.cantidad_salida AS Cantidad_Salida,
-                s.reajuste_negativo AS Reajuste,
-                s.cantidad_actual AS Cantidad_Total,
-                s.precio AS Precio,
-                s.id AS OrdenInsercion
-            FROM
-                salidas s
-            LEFT JOIN
-                destinatarios des ON s.destinatario_id = des.id
-            WHERE
-                s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
+    s.fecha AS FechaOriginal,
+    s.numero_referencia AS Numero_de_referencia,
+    s.destinatario AS Remitente_Destinatario,
+    NULL AS Cantidad_Entrada,
+    (SELECT e.precio_unitario FROM entradas e WHERE e.numero_lote = s.lote_salida LIMIT 1) AS Precio_Unitario,
+    NULL AS Valor_Total,
+    s.fecha_vencimiento AS Fecha_vencimiento_original,
+    s.lote_salida AS Numero_Lote,
+    s.cantidad_salida AS Cantidad_Salida,
+    s.reajuste_negativo AS Reajuste,
+    s.cantidad_actual AS Cantidad_Total,
+    s.precio AS Precio,
+    s.observaciones AS Observaciones,
+    s.id AS OrdenInsercion
+FROM
+    salidas s
+WHERE
+    s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
+
         ) AS datos
         ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
     ", [
@@ -244,9 +269,6 @@ class ConsultaController extends Controller
 
         return $pdf->download('reporte_kardex.pdf');
     }
-
-
-
 
     public function index(Request $request)
     {

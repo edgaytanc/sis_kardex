@@ -9,12 +9,12 @@ class CompleteExport implements WithMultipleSheets
     public function sheets(): array
     {
         $sheets =[];
-
-        $sheets[] = new EntradasExport();
-        $sheets[] = new SalidasExport();
+        $sheets[] = new UsersExport();
         $sheets[] = new DestinatariosExport();
         $sheets[] = new RemitentesExport();
-        $sheets[] = new UsersExport();
+        $sheets[] = new EntradasExport();
+        $sheets[] = new SalidasExport();
+
 
         return $sheets;
     }

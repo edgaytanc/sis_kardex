@@ -85,10 +85,7 @@
                             <td>{{ $salida->nombre_producto ?? '-' }}</td>
                             <td>{{ $salida->fecha ?? '-' }}</td>
                             <td>{{ $salida->numero_referencia ?? '-' }}</td>
-                            <td>
-                                {{ optional($salida->destinatario)->nombre ??
-                                '-' }}
-                            </td>
+                            <td>{{ $salida->destinatario ?? '-' }}</td>
                             <td>{{ $salida->fecha_vencimiento ?? '-' }}</td>
                             <td>{{ $salida->lote_salida ?? '-' }}</td>
                             <td>{{ $salida->cantidad_salida ?? '-' }}</td>
