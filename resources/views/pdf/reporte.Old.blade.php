@@ -45,7 +45,14 @@
     </style>
 </head>
 <body>
-@foreach($datosPorPagina as $pagina => $bloqueDatos)
+@php
+    $precioUnitarioVienen = null;
+    $fechaVencimientoVienen = null;
+    $numeroLoteVienen = null;
+    $cantidadTotalVienen = null;
+    $precioVienen = null;
+@endphp
+@foreach(array_chunk($datos, 22) as $pagina => $bloqueDatos)
     @if($pagina > 0)
         <div style="page-break-before: always;"></div>
     @endif
@@ -62,6 +69,7 @@
             <img src="{{ public_path('images/nivel_seguridad.png') }}" style="height: 100px;" alt="Niveles de Seguridad">
         </div>
     </div>
+
     <table>
         <thead>
             <tr>
@@ -82,7 +90,6 @@
         </thead>
         <tbody>
             @if($pagina > 0)
-                <!-- Filas "vienen" al inicio de cada página (excepto la primera) -->
                 <tr>
                     <td></td>
                     <td></td>
@@ -124,7 +131,6 @@
                     $precioVienen = $dato->Precio;
                 @endphp
             @endforeach
-                <!-- Filas "van" al final de cada página -->
                 <tr>
                     <td></td>
                     <td></td>

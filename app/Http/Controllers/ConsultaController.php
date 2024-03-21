@@ -77,6 +77,7 @@ class ConsultaController extends Controller
             FROM (
                 SELECT
                     e.fecha AS FechaOriginal,
+                    e.created_at AS CreatedAtOriginal,
                     e.numero_referencia AS Numero_de_referencia,
                     e.remitente AS Remitente_Destinatario,
                     e.cantidad AS Cantidad_Entrada,
@@ -98,35 +99,42 @@ class ConsultaController extends Controller
                 UNION ALL
 
                 SELECT
-    s.fecha AS FechaOriginal,
-    s.numero_referencia AS Numero_de_referencia,
-    s.destinatario AS Remitente_Destinatario,
-    NULL AS Cantidad_Entrada,
-    (SELECT e.precio_unitario FROM entradas e WHERE e.numero_lote = s.lote_salida LIMIT 1) AS Precio_Unitario,
-    NULL AS Valor_Total,
-    s.fecha_vencimiento AS Fecha_vencimiento_original,
-    s.lote_salida AS Numero_Lote,
-    s.cantidad_salida AS Cantidad_Salida,
-    s.reajuste_negativo AS Reajuste,
-    s.cantidad_actual AS Cantidad_Total,
-    s.precio AS Precio,
-    s.observaciones AS Observaciones,
-    s.id AS OrdenInsercion
-FROM
-    salidas s
-WHERE
-    s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
-            ) AS datos
-            ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
+                    s.fecha AS FechaOriginal,
+                    s.created_at AS CreatedAtOriginal,
+                    s.numero_referencia AS Numero_de_referencia,
+                    s.destinatario AS Remitente_Destinatario,
+                    NULL AS Cantidad_Entrada,
+                    (SELECT e.precio_unitario FROM entradas e WHERE e.numero_lote = s.lote_salida LIMIT 1) AS Precio_Unitario,
+                    NULL AS Valor_Total,
+                    s.fecha_vencimiento AS Fecha_vencimiento_original,
+                    s.lote_salida AS Numero_Lote,
+                    s.cantidad_salida AS Cantidad_Salida,
+                    s.reajuste_negativo AS Reajuste,
+                    s.cantidad_actual AS Cantidad_Total,
+                    s.precio AS Precio,
+                    s.observaciones AS Observaciones,
+                    s.id AS OrdenInsercion
+                FROM
+                    salidas s
+                WHERE
+                    s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
+                            ) AS datos
+                            ORDER BY datos.FechaOriginal ASC, datos.CreatedAtOriginal ASC, datos.OrdenInsercion ASC
 
-        ", [
-            'productoIdEntrada' => $productoId,
-            'userIdEntrada' => $userId,
-            'nombreProductoSalida' => $nombreProducto,
-            'userIdSalida' => $userId
-        ]);
+                        ", [
+                            'productoIdEntrada' => $productoId,
+                            'userIdEntrada' => $userId,
+                            'nombreProductoSalida' => $nombreProducto,
+                            'userIdSalida' => $userId
+                        ]);
 
         return view('app.consultas.mostrar_datos', compact('datos','nombreProducto','localidad','productoId','userId'));
+    }
+
+    private function estimarLineas($texto, $anchoMaximoCaracteres = 100) {
+        $longitudTexto = mb_strlen($texto);
+        $lineas = ceil($longitudTexto / $anchoMaximoCaracteres);
+        return $lineas;
     }
 
 
@@ -159,20 +167,20 @@ WHERE
         DB::statement("SET @precio_acumulado := 0;");
 
         $datos = DB::select("
-        SELECT
-            DATE_FORMAT(datos.FechaOriginal, '%d/%m/%Y') AS Fecha,
-            datos.Numero_de_referencia,
-            datos.Remitente_Destinatario,
-            datos.Cantidad_Entrada,
-            datos.Precio_Unitario,
-            datos.Valor_Total,
-            DATE_FORMAT(datos.Fecha_vencimiento_original, '%d/%m/%Y') AS Fecha_vencimiento,
-            datos.Numero_Lote,
-            datos.Cantidad_Salida,
-            datos.Reajuste,
-            datos.Observaciones,
+            SELECT
+                DATE_FORMAT(datos.FechaOriginal, '%d/%m/%Y') AS Fecha,
+                datos.Numero_de_referencia,
+                datos.Remitente_Destinatario,
+                datos.Cantidad_Entrada,
+                datos.Precio_Unitario,
+                datos.Valor_Total,
+                DATE_FORMAT(datos.Fecha_vencimiento_original, '%d/%m/%Y') AS Fecha_vencimiento,
+                datos.Numero_Lote,
+                datos.Cantidad_Salida,
+                datos.Reajuste,
+                datos.Observaciones,
 
-            @saldo_acumulado := @saldo_acumulado + COALESCE(datos.Cantidad_Entrada, 0) - COALESCE(datos.Cantidad_Salida, 0) + COALESCE(datos.Reajuste, 0) AS Cantidad_Total,
+                @saldo_acumulado := @saldo_acumulado + COALESCE(datos.Cantidad_Entrada, 0) - COALESCE(datos.Cantidad_Salida, 0) + COALESCE(datos.Reajuste, 0) AS Cantidad_Total,
                 @precio_acumulado := CASE
                     WHEN COALESCE(datos.Cantidad_Entrada, 0) > 0 THEN @precio_acumulado + (COALESCE(datos.Valor_Total, 0))
                     WHEN COALESCE(datos.Reajuste, 0) <> 0 THEN @precio_acumulado + (COALESCE(datos.Reajuste,0) * COALESCE(datos.Precio_Unitario, 0))
@@ -186,51 +194,52 @@ WHERE
                     ELSE @saldo_acumulado * COALESCE(datos.Precio_Unitario,0)
                 END AS Precio
 
-        FROM (
-            SELECT
-                e.fecha AS FechaOriginal,
-                e.numero_referencia AS Numero_de_referencia,
-                e.remitente AS Remitente_Destinatario,
-                e.cantidad AS Cantidad_Entrada,
-                e.precio_unitario AS Precio_Unitario,
-                (e.cantidad * e.precio_unitario) AS Valor_Total,
-                e.fecha_vencimiento AS Fecha_vencimiento_original,
-                e.numero_lote AS Numero_Lote,
-                NULL AS Cantidad_Salida,
-                e.reajuste_positivo AS Reajuste,
-                e.cantidad AS Cantidad_Total,
-                e.precio AS Precio,
-                e.observaciones AS Observaciones,
-                e.id AS OrdenInsercion
-            FROM
-                entradas e
-            WHERE
-                e.producto_id = :productoIdEntrada AND e.id_user = :userIdEntrada
+            FROM (
+                SELECT
+                    e.fecha AS FechaOriginal,
+                    e.created_at AS CreatedAtOriginal,
+                    e.numero_referencia AS Numero_de_referencia,
+                    e.remitente AS Remitente_Destinatario,
+                    e.cantidad AS Cantidad_Entrada,
+                    e.precio_unitario AS Precio_Unitario,
+                    (e.cantidad * e.precio_unitario) AS Valor_Total,
+                    e.fecha_vencimiento AS Fecha_vencimiento_original,
+                    e.numero_lote AS Numero_Lote,
+                    NULL AS Cantidad_Salida,
+                    e.reajuste_positivo AS Reajuste,
+                    e.cantidad AS Cantidad_Total,
+                    e.precio AS Precio,
+                    e.observaciones AS Observaciones,
+                    e.id AS OrdenInsercion
+                FROM
+                    entradas e
+                WHERE
+                    e.producto_id = :productoIdEntrada AND e.id_user = :userIdEntrada
 
-            UNION ALL
+                UNION ALL
 
-            SELECT
-    s.fecha AS FechaOriginal,
-    s.numero_referencia AS Numero_de_referencia,
-    s.destinatario AS Remitente_Destinatario,
-    NULL AS Cantidad_Entrada,
-    (SELECT e.precio_unitario FROM entradas e WHERE e.numero_lote = s.lote_salida LIMIT 1) AS Precio_Unitario,
-    NULL AS Valor_Total,
-    s.fecha_vencimiento AS Fecha_vencimiento_original,
-    s.lote_salida AS Numero_Lote,
-    s.cantidad_salida AS Cantidad_Salida,
-    s.reajuste_negativo AS Reajuste,
-    s.cantidad_actual AS Cantidad_Total,
-    s.precio AS Precio,
-    s.observaciones AS Observaciones,
-    s.id AS OrdenInsercion
-FROM
-    salidas s
-WHERE
-    s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
-
-        ) AS datos
-        ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
+                SELECT
+                    s.fecha AS FechaOriginal,
+                    s.created_at AS CreatedAtOriginal,
+                    s.numero_referencia AS Numero_de_referencia,
+                    s.destinatario AS Remitente_Destinatario,
+                    NULL AS Cantidad_Entrada,
+                    (SELECT e.precio_unitario FROM entradas e WHERE e.numero_lote = s.lote_salida LIMIT 1) AS Precio_Unitario,
+                    NULL AS Valor_Total,
+                    s.fecha_vencimiento AS Fecha_vencimiento_original,
+                    s.lote_salida AS Numero_Lote,
+                    s.cantidad_salida AS Cantidad_Salida,
+                    s.reajuste_negativo AS Reajuste,
+                    s.cantidad_actual AS Cantidad_Total,
+                    s.precio AS Precio,
+                    s.observaciones AS Observaciones,
+                    s.id AS OrdenInsercion
+                FROM
+                    salidas s
+                WHERE
+                    s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
+                            ) AS datos
+                            ORDER BY datos.FechaOriginal ASC, datos.CreatedAtOriginal ASC, datos.OrdenInsercion ASC
     ", [
         'productoIdEntrada' => $productoId,
         'userIdEntrada' => $userId,
@@ -263,12 +272,47 @@ WHERE
             }
         }
 
+        // codigo nuevo para repote
+        $lineasPorPagina = 44;
+        $lineasUsadas = 0;
+        $paginaActual = 0;
+        $datosPorPagina = [];
+
+        foreach ($datos as $dato) {
+            $lineasEstimadas = $this->estimarLineas($dato->Numero_de_referencia, 100); //aqui se ajusta segun lo que se necesite\
+            $lineasTotales = $lineasEstimadas + 1; //ajuste segun analisis
+
+            if (($lineasUsadas + $lineasTotales) > $lineasPorPagina) {
+                $paginaActual++; //Mueve a la siguiente pagina
+                $lineasUsadas = 0; // resetea el conteo para la nueva pagina
+            }
+
+            if (!isset($datosPorPagina[$paginaActual])) {
+                $datosPorPagina[$paginaActual] = [];
+            }
+
+            $datosPorPagina[$paginaActual][] = $dato; //Agrega el registro al grupo de la pagina actual
+            $lineasUsadas += $lineasTotales;
+        }
+
+        // aqui termina codigo nuevo
         $pdf = app('dompdf.wrapper');
-        $pdf->loadView('pdf.reporte', compact('datos', 'nombreProducto', 'localidad'))
-            ->setPaper('legal', 'landscape');
+        $pdf->loadView('pdf.reporte',[
+            'datosPorPagina' => $datosPorPagina,
+            'nombreProducto' => $nombreProducto,
+            'localidad' => $localidad,
+        ])
+            ->setPaper('legal','landscape');
+
+
+        // $pdf = app('dompdf.wrapper');
+        // $pdf->loadView('pdf.reporte', compact('datos', 'nombreProducto', 'localidad'))
+        //     ->setPaper('legal', 'landscape');
 
         return $pdf->download('reporte_kardex.pdf');
     }
+
+
 
     public function index(Request $request)
     {
@@ -289,6 +333,8 @@ WHERE
         // Redirigir a la vista de selección de producto con el ID del usuario como parámetro
         return redirect()->route('seleccionar_producto', ['userId' => $userId]);
     }
+
+
 
 
 
