@@ -4,20 +4,28 @@ namespace App\Imports;
 
 use App\Models\Entrada;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\Importable;
 
 class EntradasImport implements ToModel, WithHeadingRow
 {
     use Importable;
 
+    protected $importedIds = [];
+
     public function model(array $row)
     {
-        // Verificar si existe un registro con el ID proporcionado.
+        if (!isset($row['id'])) {
+            Log::warning("Fila omitida debido a la falta de la clave 'id': " . json_encode($row));
+            return null;
+        }
+
+        // Buscar la entrada por su ID proporcionado
         $entrada = Entrada::find($row['id']);
 
         if ($entrada) {
-            // Actualizar el registro existente.
+            // Actualizar el registro existente
             $entrada->update([
                 'producto_id' => $row['producto_id'],
                 'fecha' => $row['fecha'],
@@ -25,17 +33,17 @@ class EntradasImport implements ToModel, WithHeadingRow
                 'cantidad' => $row['cantidad'],
                 'precio_unitario' => $row['precio_unitario'],
                 'fecha_vencimiento' => $row['fecha_vencimiento'],
-                'remitente_id' => $row['remitente_id'],
+                'remitente' => $row['remitente'],
                 'numero_lote' => $row['numero_lote'],
                 'reajuste_positivo' => $row['reajuste_positivo'],
                 'id_user' => $row['id_user'],
                 'cantidad_actual' => $row['cantidad_actual'],
                 'precio' => $row['precio'],
+                'observaciones' => $row['observaciones'],
             ]);
-            return null; // Retorna null para no crear un nuevo modelo
         } else {
             // Crear un nuevo registro si no existe.
-            return new Entrada([
+            $entrada = new Entrada([
                 'id' => $row['id'],
                 'producto_id' => $row['producto_id'],
                 'fecha' => $row['fecha'],
@@ -43,13 +51,25 @@ class EntradasImport implements ToModel, WithHeadingRow
                 'cantidad' => $row['cantidad'],
                 'precio_unitario' => $row['precio_unitario'],
                 'fecha_vencimiento' => $row['fecha_vencimiento'],
-                'remitente_id' => $row['remitente_id'],
+                'remitente' => $row['remitente'],
                 'numero_lote' => $row['numero_lote'],
                 'reajuste_positivo' => $row['reajuste_positivo'],
                 'id_user' => $row['id_user'],
                 'cantidad_actual' => $row['cantidad_actual'],
                 'precio' => $row['precio'],
+                'observaciones' => $row['observaciones'],
             ]);
         }
+
+        // Registrar la ID importada
+        $this->importedIds[] = $row['id'];
+
+        return $entrada;
+    }
+
+    public function onCompleted()
+    {
+        // Eliminar las entradas que no están presentes en el archivo de Excel
+        Entrada::whereNotIn('id', $this->importedIds)->delete();
     }
 }

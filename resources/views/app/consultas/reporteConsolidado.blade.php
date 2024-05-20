@@ -40,6 +40,7 @@
                 <th>Lote</th>
                 <th>Fecha Kardex</th>
                 <th>Saldo</th>
+                <th>Precio Total</th>
             </tr>
         </thead>
         <tbody>
@@ -52,6 +53,7 @@
                     <td>{{ $dato->Lote }}</td>
                     <td>{{ $dato->FechaKardex }}</td>
                     <td>{{ $dato->Saldo }}</td>
+                    <td>{{ $dato->Precio_Total}}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -60,7 +62,8 @@
     <form action="{{ url('/consolidado-kardex/pdf') }}" method="POST" class="d-inline">
         @csrf
         <input type="hidden" name="fechaKardex" value="{{ isset($fechaKardex) ? $fechaKardex : '' }}">
-        <input type="hidden" name="categoria" value="{{ isset($categoria) ? $categoria['Categoria'] : '' }}">
+        <input type="hidden" name="categoria" value="{{ isset($categoria->Categoria) ? $categoria->Categoria : '' }}">
+
         <button type="submit" class="btn btn-success mb-2">Generar PDF</button>
     </form>
 

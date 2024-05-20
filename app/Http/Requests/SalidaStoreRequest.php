@@ -20,15 +20,16 @@ class SalidaStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
+
             'nombre_producto' => ['required', 'max:255', 'string'],
             'fecha' => ['required', 'date'],
             'numero_referencia' => ['required', 'max:255', 'string'],
-            'destinatario_id' => ['required', 'exists:destinatarios,id'],
+            'destinatario' => ['required', 'max:200', 'string'],
             'fecha_vencimiento' => ['nullable', 'date'],
             'lote_salida' => ['nullable', 'max:255', 'string'],
             'cantidad_salida' => ['nullable', 'numeric'],
             'reajuste_negativo' => ['nullable', 'numeric'],
+            'observaciones' => ['nullable', 'string'],
         ];
     }
 }

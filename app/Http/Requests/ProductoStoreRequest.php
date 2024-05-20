@@ -22,7 +22,7 @@ class ProductoStoreRequest extends FormRequest
         return [
             'categoria' => [
                 'required',
-                'in:Medicamento,Equipo quirurgico,Suministros',
+                'in:Medicamento,Equipo quirurgico,Suministros,DONACIONES y traslados,BIOLOGICOS,Repuestos',
             ],
             'nombre' => ['required', 'max:255', 'string'],
             'presentacion' => ['nullable', 'max:255', 'string'],

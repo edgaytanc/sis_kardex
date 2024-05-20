@@ -1,4 +1,3 @@
-{{-- resources/views/app/consultas/seleccionar_producto.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -15,9 +14,10 @@
         @csrf
         <div class="form-group">
             <label for="producto_id">Seleccione un Producto:</label>
+            <input type="text" id="searchProducto" class="form-control" placeholder="Buscar producto">
             <select name="producto_id" id="producto_id" class="form-control">
                 @foreach($productos as $producto)
-                    <option value="{{ $producto->id }}">{{ $producto->id }} - {{ $producto->nombre }}</option>
+                    <option value="{{ $producto->id }}" data-search="{{ strtolower($producto->nombre) }}">{{ $producto->id }} - {{ $producto->nombre }}</option>
                 @endforeach
             </select>
         </div>
@@ -26,4 +26,26 @@
         <button type="submit" class="btn btn-primary">Generar</button>
     </form>
 </div>
+
+<script>
+    // Agregar evento de input al campo de búsqueda
+    document.getElementById('searchProducto').addEventListener('input', function(event) {
+        var searchValue = this.value.toLowerCase();
+        var options = document.getElementById('producto_id').options;
+
+        for (var i = 0; i < options.length; i++) {
+            var dataSearch = options[i].getAttribute('data-search').toLowerCase();
+            var contains = dataSearch.includes(searchValue);
+            options[i].style.display = contains ? 'block' : 'none';
+        }
+    });
+
+    // Deshabilitar el envío del formulario al presionar Enter en el campo de búsqueda
+    document.getElementById('searchProducto').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+        }
+    });
+</script>
+
 @endsection

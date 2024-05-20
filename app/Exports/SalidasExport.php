@@ -14,7 +14,7 @@ class SalidasExport implements FromCollection, WithHeadings, WithCustomCsvSettin
     */
     public function collection()
     {
-        return Salida::select('id','entrada_id','nombre_producto','fecha','numero_referencia','destinatario_id','fecha_vencimiento','lote_salida','cantidad_salida','reajuste_negativo','id_user','precio','cantidad_actual','precio_unitario')->get();
+        return Salida::select('id','entrada_id','nombre_producto','fecha','numero_referencia','destinatario','fecha_vencimiento','lote_salida','cantidad_salida','reajuste_negativo','id_user','precio','cantidad_actual','precio_unitario','observaciones')->get();
     }
 
     /**
@@ -28,7 +28,7 @@ class SalidasExport implements FromCollection, WithHeadings, WithCustomCsvSettin
             'nombre_producto',
             'fecha',
             'numero_referencia',
-            'destinatario_id',
+            'destinatario',
             'fecha_vencimiento',
             'lote_salida',
             'cantidad_salida',
@@ -37,6 +37,7 @@ class SalidasExport implements FromCollection, WithHeadings, WithCustomCsvSettin
             'precio',
             'cantidad_actual',
             'precio_unitario',
+            'observaciones',
         ];
     }
 

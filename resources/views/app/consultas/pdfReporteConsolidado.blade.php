@@ -66,6 +66,7 @@
                 <th>Lote</th>
                 <th>Fecha Kardex</th>
                 <th>Saldo</th>
+                <th>Precio Total</th>
             </tr>
         </thead>
         <tbody>
@@ -78,6 +79,7 @@
                     <td>{{ $dato->Lote }}</td>
                     <td>{{ $dato->FechaKardex }}</td>
                     <td>{{ $dato->Saldo }}</td>
+                    <td>{{ $dato->Precio_Total}}</td>
                 </tr>
             @endforeach
         </tbody>

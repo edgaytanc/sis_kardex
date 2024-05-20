@@ -12,29 +12,31 @@
             en un solo archivo. Selecciona la tabla que deseas exportar o elige la opción de exportación completa
             para obtener un archivo con todos los datos relevantes.</p>
             <div class="row align-items-center justify-content-around py-3">
-                <div class="col-3">
+                <div class="col-2">
                     <a class="btn btn-success " href="{{ route('export.productos') }}">Exportar Productos</a>
                 </div>
-                <div class="col-3">
+                <div class="col-2">
                     <a class="btn btn-primary " href="{{ route('export.users') }}">Exportar Usuarios</a>
                 </div>
-                <div class="col-3">
+                {{-- <div class="col-3">
                     <a class="btn btn-primary " href="{{ route('export.destinatarios') }}">Exportar Destinatarios</a>
                 </div>
                 <div class="col-3">
                     <a class="btn btn-primary " href="{{ route('export.remitentes') }}">Exportar Remitentes</a>
+                </div> --}}
+                <div class="col-2">
+                    <a class="btn btn-primary " href="{{ route('export.entradas') }}">Exportar Entradas</a>
+                </div>
+                <div class="col-2">
+                    <a class="btn btn-primary " href="{{ route('export.salidas') }}">Exportar Salidas</a>
+                </div>
+                <div class="col-2">
+                    <a class="btn btn-danger " href="{{ route('export.all') }}">Exportar Todo</a>
                 </div>
             </div>
             <div class="row align-items-center justify-content-around py-3">
-                <div class="col-3">
-                    <a class="btn btn-primary " href="{{ route('export.entradas') }}">Exportar Entradas</a>
-                </div>
-                <div class="col-3">
-                    <a class="btn btn-primary " href="{{ route('export.salidas') }}">Exportar Salidas</a>
-                </div>
-                <div class="col-3">
-                    <a class="btn btn-danger " href="{{ route('export.all') }}">Exportar Todo</a>
-                </div>
+
+
                 <div class="col-3">
 
                 </div>
@@ -134,7 +136,7 @@
         <div class="col-md-6">
 
 
-            <div class="card">
+            {{-- <div class="card">
                 <div class="card-header">
                     <label for="file">Archivo CVS de Destinatarios:</label>
                 </div>
@@ -142,10 +144,26 @@
                     <form action="{{ route('destinatarios.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
-                            {{-- <label for="file">Archivo CVS de Usuarios:</label> --}}
+
                             <input type="file" name="file" class="form-control-file" required>
                         </div>
                         <button type="submit" class="btn btn-primary ">Importar Destinatarios</button>
+                    </form>
+                </div>
+            </div> --}}
+
+            <div class="card">
+                <div class="card-header">
+                    <label for="file">Archivo Completo:</label>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('importar') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-group">
+
+                            <input type="file" name="file" class="form-control-file" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger ">Importar todo</button>
                     </form>
                 </div>
             </div>
@@ -156,7 +174,7 @@
         <!-- Columna 1 - Remitentes -->
         <div class="col-md-6">
 
-            <div class="card">
+            {{-- <div class="card">
                 <div class="card-header">
                     <label for="file">Archivo CVS de Remitentes:</label>
                 </div>
@@ -164,31 +182,17 @@
                     <form action="{{ route('remitentes.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
-                            {{-- <label for="file">Archivo CVS de Usuarios:</label> --}}
+
                             <input type="file" name="file" class="form-control-file" required>
                         </div>
                         <button type="submit" class="btn btn-primary ">Importar Remitentes</button>
                     </form>
                 </div>
-            </div>
+            </div> --}}
         </div>
         <!-- Columna 2 - Vacía para mantener la simetría -->
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <label for="file">Archivo Completo:</label>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('importar') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="form-group">
-                            {{-- <label for="file">Archivo CVS de Usuarios:</label> --}}
-                            <input type="file" name="file" class="form-control-file" required>
-                        </div>
-                        <button type="submit" class="btn btn-danger ">Importar todo</button>
-                    </form>
-                </div>
-            </div>
+
         </div>
     </div>
 

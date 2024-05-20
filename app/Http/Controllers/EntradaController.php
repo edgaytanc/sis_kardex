@@ -12,13 +12,12 @@ use App\Http\Requests\EntradaStoreRequest;
 use App\Http\Requests\EntradaUpdateRequest;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
+
 
 
 class EntradaController extends Controller
 {
-
-
-
 
 
     /**
@@ -39,10 +38,6 @@ class EntradaController extends Controller
         $entradas = $entradas->latest()
             ->paginate(5)
             ->withQueryString();
-        // $entradas = Entrada::search($search)
-        //     ->latest()
-        //     ->paginate(5)
-        //     ->withQueryString();
 
         return view('app.entradas.index', compact('entradas', 'search'));
     }
@@ -50,15 +45,22 @@ class EntradaController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request): View
-    {
-        $this->authorize('create', Entrada::class);
+   // EntradaController.php
 
-        $productos = Producto::pluck('nombre', 'id');
-        $remitentes = Remitente::pluck('nombre', 'id');
+public function create(Request $request): View
+{
+    $this->authorize('create', Entrada::class);
 
-        return view('app.entradas.create', compact('productos', 'remitentes'));
-    }
+    // Obtener todos los productos con sus nombres y categorías
+    $productos = Producto::pluck('nombre', 'id')->map(function ($nombre, $id) {
+        $producto = Producto::find($id);
+        return $nombre . ' -- ' . $producto->categoria;
+    });
+
+    $remitentes = Remitente::pluck('nombre', 'id');
+
+    return view('app.entradas.create', compact('productos', 'remitentes'));
+}
 
     /**
      * Store a newly created resource in storage.
@@ -74,13 +76,18 @@ class EntradaController extends Controller
         $validated['cantidad_actual'] = $validated['cantidad'];
         $validated['precio'] = $validated['cantidad'] * $validated['precio_unitario'];
 
+        // Verificar si hay reajuste positivo y ajustar la cantidad actual en consecuencia
+        $reajustePositivo = $validated['reajuste_positivo'] ?? 0;
+        if ($reajustePositivo > 0) {
+            $validated['cantidad_actual'] += $reajustePositivo;
+        }
+
         $entrada = Entrada::create($validated);
 
         return redirect()
             ->route('entradas.edit', $entrada)
             ->withSuccess(__('crud.common.created'));
     }
-
     /**
      * Display the specified resource.
      */
@@ -133,9 +140,31 @@ class EntradaController extends Controller
         $validated = $request->validated();
         $validated['id_user'] = Auth::id();
 
+        // Recuperar el registro de entrada actual por ID para obtener la cantidad_actual
+        $entradaActual = Entrada::find($entrada->id);
+
         // Asignar el valor de cantidad a cantidad_actual solo si se proporciona cantidad
-        if (isset($validated['cantidad'])) {
-            $validated['cantidad_actual'] = $validated['cantidad'];
+        // if (isset($validated['cantidad'])) {
+        //     $validated['cantidad_actual'] = $validated['cantidad'];
+        // }
+    
+
+        if (isset($validated['cantidad']) || isset($validated['reajuste_positivo'])) {
+            // Inicializar la diferencia en cero
+            $diferencia = 0;
+        
+            // Calcular la diferencia para la cantidad, si se proporciona
+            if (isset($validated['cantidad'])) {
+                $diferencia += $validated['cantidad'] - $entradaActual->cantidad;
+            }
+        
+            // Calcular la diferencia para el reajuste positivo, si se proporciona
+            if (isset($validated['reajuste_positivo'])) {
+                $diferencia += $validated['reajuste_positivo'] - $entradaActual->reajuste_positivo;
+            }
+
+            // Ajustar cantidad_actual basado en la diferencia calculada
+            $validated['cantidad_actual'] = $entradaActual->cantidad_actual + $diferencia;
         }
 
         $entrada->update($validated);
@@ -169,8 +198,17 @@ class EntradaController extends Controller
 
         $this->authorize('delete', $entrada);
 
+        // Verificar si hay movimientos de salida asociados a esta entrada
+        $salidasCount = $entrada->salidas()->count();
+    
+        if ($salidasCount > 0) {
+            // Usar mensaje flash para mostrar el error
+            return redirect()->route('entradas.index')
+            ->withSuccess(__('crud.common.delete_error'));
+        }
+    
         $entrada->delete();
-
+    
         return redirect()
             ->route('entradas.index')
             ->withSuccess(__('crud.common.removed'));

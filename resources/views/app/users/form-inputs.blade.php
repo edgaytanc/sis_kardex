@@ -4,7 +4,7 @@
     <x-inputs.group class="col-sm-12">
         <x-inputs.text
             name="name"
-            label="Name"
+            label="Nombre"
             :value="old('name', ($editing ? $user->name : ''))"
             maxlength="255"
             placeholder="Name"
@@ -15,7 +15,7 @@
     <x-inputs.group class="col-sm-12">
         <x-inputs.email
             name="email"
-            label="Email"
+            label="Correo"
             :value="old('email', ($editing ? $user->email : ''))"
             maxlength="255"
             placeholder="Email"
@@ -26,7 +26,7 @@
     <x-inputs.group class="col-sm-12">
         <x-inputs.password
             name="password"
-            label="Password"
+            label="Contraseña"
             maxlength="255"
             placeholder="Password"
             :required="!$editing"
@@ -45,7 +45,7 @@
 
 
     <div class="form-group col-sm-12 mt-4">
-        <h4>Assign @lang('crud.roles.name')</h4>
+        <h4>Asignación de @lang('crud.roles.name')</h4>
 
         @foreach ($roles as $role)
         <div>

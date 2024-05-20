@@ -7,6 +7,10 @@
             <option value="Medicamento" {{ $selected == 'Medicamento' ? 'selected' : '' }} >Medicamento</option>
             <option value="Equipo quirurgico" {{ $selected == 'Equipo quirurgico' ? 'selected' : '' }} >Equipo quirurgico</option>
             <option value="Suministros" {{ $selected == 'Suministros' ? 'selected' : '' }} >Suministros</option>
+            <option value="DONACIONES y traslados" {{ $selected == 'DONACIONES y traslados' ? 'selected' : '' }} >DONACIONES y traslados</option>
+            <option value="BIOLOGICOS" {{ $selected == 'BIOLOGICOS' ? 'selected' : '' }} >BIOLOGICOS</option>
+            <option value="Repuestos" {{ $selected == 'Repuestos' ? 'selected' : '' }} >Repuestos</option>
+            
         </x-inputs.select>
     </x-inputs.group>
 

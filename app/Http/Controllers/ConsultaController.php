@@ -37,10 +37,14 @@ class ConsultaController extends Controller
 
         // Obtiene el último precio unitario no NULL para usarlo como valor predeterminado
         $precio_unitario = DB::table('entradas')
+
             ->where('cantidad_actual', '>', 0)
             ->whereNotNull('precio_unitario')
             ->orderByDesc('fecha')
             ->value('precio_unitario');
+            DB::statement("SET @saldo_acumulado := 0;");
+            DB::statement("SET @precio_acumulado := 0;");
+            DB::statement("SET @valor_total_acumulado:=0;");
 
             $datos = DB::select("
             SELECT
@@ -54,13 +58,28 @@ class ConsultaController extends Controller
                 datos.Numero_Lote,
                 datos.Cantidad_Salida,
                 datos.Reajuste,
-                datos.Cantidad_Total,
-                datos.Precio
+                datos.Observaciones,
+
+                @saldo_acumulado := @saldo_acumulado + COALESCE(datos.Cantidad_Entrada, 0) - COALESCE(datos.Cantidad_Salida, 0) + COALESCE(datos.Reajuste, 0) AS Cantidad_Total,
+                @precio_acumulado := CASE
+                    WHEN COALESCE(datos.Cantidad_Entrada, 0) > 0 THEN @precio_acumulado + (COALESCE(datos.Valor_Total, 0))
+                    WHEN COALESCE(datos.Reajuste, 0) <> 0 THEN @precio_acumulado + (COALESCE(datos.Reajuste,0) * COALESCE(datos.Precio_Unitario, 0))
+                    WHEN COALESCE(datos.Cantidad_Salida, 0) > 0 THEN
+                        CASE
+                            WHEN COALESCE(datos.Reajuste, 0) > 0 THEN @precio_acumulado - ((COALESCE(datos.Cantidad_Salida, 0) - COALESCE(datos.Reajuste, 0)) * COALESCE(datos.Precio_Unitario, 0))
+                            WHEN COALESCE(datos.Reajuste, 0) < 0 THEN @precio_acumulado - (COALESCE(datos.Cantidad_Salida, 0) * COALESCE(datos.Precio_Unitario, 0))
+
+                            ELSE @precio_acumulado - (COALESCE(datos.Cantidad_Salida, 0) * COALESCE(datos.Precio_Unitario, 0))
+                        END
+                    ELSE @saldo_acumulado * COALESCE(datos.Precio_Unitario,0)
+                END AS Precio
+
             FROM (
                 SELECT
                     e.fecha AS FechaOriginal,
+                    e.created_at AS CreatedAtOriginal,
                     e.numero_referencia AS Numero_de_referencia,
-                    rem.nombre AS Remitente_Destinatario,
+                    e.remitente AS Remitente_Destinatario,
                     e.cantidad AS Cantidad_Entrada,
                     e.precio_unitario AS Precio_Unitario,
                     (e.cantidad * e.precio_unitario) AS Valor_Total,
@@ -70,11 +89,10 @@ class ConsultaController extends Controller
                     e.reajuste_positivo AS Reajuste,
                     e.cantidad AS Cantidad_Total,
                     e.precio AS Precio,
-                    e.id AS OrdenInsercion -- Asumiendo 'id' es autoincrementable y refleja el orden de inserción
+                    e.observaciones AS Observaciones,
+                    e.id AS OrdenInsercion
                 FROM
                     entradas e
-                LEFT JOIN
-                    remitentes rem ON e.remitente_id = rem.id
                 WHERE
                     e.producto_id = :productoIdEntrada AND e.id_user = :userIdEntrada
 
@@ -82,10 +100,11 @@ class ConsultaController extends Controller
 
                 SELECT
                     s.fecha AS FechaOriginal,
+                    s.created_at AS CreatedAtOriginal,
                     s.numero_referencia AS Numero_de_referencia,
-                    des.nombre AS Remitente_Destinatario,
+                    s.destinatario AS Remitente_Destinatario,
                     NULL AS Cantidad_Entrada,
-                    s.precio_unitario AS Precio_Unitario,
+                    (SELECT e.precio_unitario FROM entradas e WHERE e.numero_lote = s.lote_salida LIMIT 1) AS Precio_Unitario,
                     NULL AS Valor_Total,
                     s.fecha_vencimiento AS Fecha_vencimiento_original,
                     s.lote_salida AS Numero_Lote,
@@ -93,24 +112,29 @@ class ConsultaController extends Controller
                     s.reajuste_negativo AS Reajuste,
                     s.cantidad_actual AS Cantidad_Total,
                     s.precio AS Precio,
+                    s.observaciones AS Observaciones,
                     s.id AS OrdenInsercion
                 FROM
                     salidas s
-                LEFT JOIN
-                    destinatarios des ON s.destinatario_id = des.id
                 WHERE
                     s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
-            ) AS datos
-            ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
+                            ) AS datos
+                            ORDER BY datos.FechaOriginal ASC, datos.CreatedAtOriginal ASC, datos.OrdenInsercion ASC
 
-        ", [
-            'productoIdEntrada' => $productoId,
-            'userIdEntrada' => $userId,
-            'nombreProductoSalida' => $nombreProducto,
-            'userIdSalida' => $userId
-        ]);
+                        ", [
+                            'productoIdEntrada' => $productoId,
+                            'userIdEntrada' => $userId,
+                            'nombreProductoSalida' => $nombreProducto,
+                            'userIdSalida' => $userId
+                        ]);
 
         return view('app.consultas.mostrar_datos', compact('datos','nombreProducto','localidad','productoId','userId'));
+    }
+
+    private function estimarLineas($texto, $anchoMaximoCaracteres = 100) {
+        $longitudTexto = mb_strlen($texto);
+        $lineas = ceil($longitudTexto / $anchoMaximoCaracteres);
+        return $lineas;
     }
 
 
@@ -138,9 +162,9 @@ class ConsultaController extends Controller
         }
 
 
-
-        // $localidad = auth()->user()->localidad;
-        // $userId = auth()->user()->id;
+        // Inicializa la variable @saldo_acumulado
+        DB::statement("SET @saldo_acumulado := 0;");
+        DB::statement("SET @precio_acumulado := 0;");
 
         $datos = DB::select("
             SELECT
@@ -154,13 +178,28 @@ class ConsultaController extends Controller
                 datos.Numero_Lote,
                 datos.Cantidad_Salida,
                 datos.Reajuste,
-                datos.Cantidad_Total,
-                datos.Precio
+                datos.Observaciones,
+
+                @saldo_acumulado := @saldo_acumulado + COALESCE(datos.Cantidad_Entrada, 0) - COALESCE(datos.Cantidad_Salida, 0) + COALESCE(datos.Reajuste, 0) AS Cantidad_Total,
+                @precio_acumulado := CASE
+                    WHEN COALESCE(datos.Cantidad_Entrada, 0) > 0 THEN @precio_acumulado + (COALESCE(datos.Valor_Total, 0))
+                    WHEN COALESCE(datos.Reajuste, 0) <> 0 THEN @precio_acumulado + (COALESCE(datos.Reajuste,0) * COALESCE(datos.Precio_Unitario, 0))
+                    WHEN COALESCE(datos.Cantidad_Salida, 0) > 0 THEN
+                        CASE
+                            WHEN COALESCE(datos.Reajuste, 0) > 0 THEN @precio_acumulado - ((COALESCE(datos.Cantidad_Salida, 0) - COALESCE(datos.Reajuste, 0)) * COALESCE(datos.Precio_Unitario, 0))
+                            WHEN COALESCE(datos.Reajuste, 0) < 0 THEN @precio_acumulado - (COALESCE(datos.Cantidad_Salida, 0) * COALESCE(datos.Precio_Unitario, 0))
+
+                            ELSE @precio_acumulado - (COALESCE(datos.Cantidad_Salida, 0) * COALESCE(datos.Precio_Unitario, 0))
+                        END
+                    ELSE @saldo_acumulado * COALESCE(datos.Precio_Unitario,0)
+                END AS Precio
+
             FROM (
                 SELECT
                     e.fecha AS FechaOriginal,
+                    e.created_at AS CreatedAtOriginal,
                     e.numero_referencia AS Numero_de_referencia,
-                    rem.nombre AS Remitente_Destinatario,
+                    e.remitente AS Remitente_Destinatario,
                     e.cantidad AS Cantidad_Entrada,
                     e.precio_unitario AS Precio_Unitario,
                     (e.cantidad * e.precio_unitario) AS Valor_Total,
@@ -170,11 +209,10 @@ class ConsultaController extends Controller
                     e.reajuste_positivo AS Reajuste,
                     e.cantidad AS Cantidad_Total,
                     e.precio AS Precio,
-                    e.id AS OrdenInsercion -- Asumiendo 'id' es autoincrementable y refleja el orden de inserción
+                    e.observaciones AS Observaciones,
+                    e.id AS OrdenInsercion
                 FROM
                     entradas e
-                LEFT JOIN
-                    remitentes rem ON e.remitente_id = rem.id
                 WHERE
                     e.producto_id = :productoIdEntrada AND e.id_user = :userIdEntrada
 
@@ -182,10 +220,11 @@ class ConsultaController extends Controller
 
                 SELECT
                     s.fecha AS FechaOriginal,
+                    s.created_at AS CreatedAtOriginal,
                     s.numero_referencia AS Numero_de_referencia,
-                    des.nombre AS Remitente_Destinatario,
+                    s.destinatario AS Remitente_Destinatario,
                     NULL AS Cantidad_Entrada,
-                    s.precio_unitario AS Precio_Unitario,
+                    (SELECT e.precio_unitario FROM entradas e WHERE e.numero_lote = s.lote_salida LIMIT 1) AS Precio_Unitario,
                     NULL AS Valor_Total,
                     s.fecha_vencimiento AS Fecha_vencimiento_original,
                     s.lote_salida AS Numero_Lote,
@@ -193,30 +232,85 @@ class ConsultaController extends Controller
                     s.reajuste_negativo AS Reajuste,
                     s.cantidad_actual AS Cantidad_Total,
                     s.precio AS Precio,
+                    s.observaciones AS Observaciones,
                     s.id AS OrdenInsercion
                 FROM
                     salidas s
-                LEFT JOIN
-                    destinatarios des ON s.destinatario_id = des.id
                 WHERE
                     s.nombre_producto = :nombreProductoSalida AND s.id_user = :userIdSalida
-            ) AS datos
-            ORDER BY datos.FechaOriginal ASC, datos.OrdenInsercion ASC
+                            ) AS datos
+                            ORDER BY datos.FechaOriginal ASC, datos.CreatedAtOriginal ASC, datos.OrdenInsercion ASC
+    ", [
+        'productoIdEntrada' => $productoId,
+        'userIdEntrada' => $userId,
+        'nombreProductoSalida' => $nombreProducto,
+        'userIdSalida' => $userId
+    ]);
 
-        ", [
-            'productoIdEntrada' => $productoId,
-            'userIdEntrada' => $userId,
-            'nombreProductoSalida' => $nombreProducto,
-            'userIdSalida' => $userId
-        ]);
+        //Codigo prueba
+        $datosBloqueados = collect();
+        $pagina =0;
+        $cantidadPorPagina = 18;
 
+        foreach ($datos as $dato){
+            if ($pagina % 2 == 0 && $datosBloqueados->count() % 15 == 0 && $datosBloqueados->count() !=0){
+                //son 18 registros por pagina
+                $cantidadPorPagina = 18;
+                $pagina++;
+            } elseif ($pagina % 2 != 0 && $datosBloqueados->count() % $cantidadPorPagina == 0 && $datosBloqueados->count() !=0){
+                //son 15 registros por pagina
+                $cantidadPorPagina = 15;
+                $pagina++;
+            }
+
+            // Agregar datos al ultimo bloque o crear un nuevo bloque si es necesario
+            if ($datosBloqueados->isEmpty() || $datosBloqueados->last()->count() >= $cantidadPorPagina) {
+                $datosBloqueados->push(collect([$dato])); // crea un nuevo bloque con el dato actual
+            }
+            else {
+                $datosBloqueados->last()->push($dato); //Agrega un dato al ultimo bloque existente
+            }
+        }
+
+        // codigo nuevo para repote
+        $lineasPorPagina = 44;
+        $lineasUsadas = 0;
+        $paginaActual = 0;
+        $datosPorPagina = [];
+
+        foreach ($datos as $dato) {
+            $lineasEstimadas = $this->estimarLineas($dato->Numero_de_referencia, 100); //aqui se ajusta segun lo que se necesite\
+            $lineasTotales = $lineasEstimadas + 1; //ajuste segun analisis
+
+            if (($lineasUsadas + $lineasTotales) > $lineasPorPagina) {
+                $paginaActual++; //Mueve a la siguiente pagina
+                $lineasUsadas = 0; // resetea el conteo para la nueva pagina
+            }
+
+            if (!isset($datosPorPagina[$paginaActual])) {
+                $datosPorPagina[$paginaActual] = [];
+            }
+
+            $datosPorPagina[$paginaActual][] = $dato; //Agrega el registro al grupo de la pagina actual
+            $lineasUsadas += $lineasTotales;
+        }
+
+        // aqui termina codigo nuevo
         $pdf = app('dompdf.wrapper');
-        $pdf->loadView('pdf.reporte', compact('datos', 'nombreProducto', 'localidad'))
-            ->setPaper('legal', 'landscape');
+        $pdf->loadView('pdf.reporte',[
+            'datosPorPagina' => $datosPorPagina,
+            'nombreProducto' => $nombreProducto,
+            'localidad' => $localidad,
+        ])
+            ->setPaper('legal','landscape');
+
+
+        // $pdf = app('dompdf.wrapper');
+        // $pdf->loadView('pdf.reporte', compact('datos', 'nombreProducto', 'localidad'))
+        //     ->setPaper('legal', 'landscape');
 
         return $pdf->download('reporte_kardex.pdf');
     }
-
 
 
 
@@ -239,6 +333,8 @@ class ConsultaController extends Controller
         // Redirigir a la vista de selección de producto con el ID del usuario como parámetro
         return redirect()->route('seleccionar_producto', ['userId' => $userId]);
     }
+
+
 
 
 

@@ -25,7 +25,6 @@ class UsersExport implements FromCollection, WithHeadings, WithCustomCsvSettings
         return [
             'Name',
             'Email',
-            'Password',
             'Localidad',
             'Permiso',
         ];

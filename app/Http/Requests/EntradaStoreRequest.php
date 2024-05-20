@@ -26,9 +26,10 @@ class EntradaStoreRequest extends FormRequest
             'cantidad' => ['nullable', 'numeric'],
             'precio_unitario' => ['nullable', 'numeric'],
             'fecha_vencimiento' => ['nullable', 'date'],
-            'remitente_id' => ['required', 'exists:remitentes,id'],
+            'remitente' => ['required', 'max:200','string'],
             'numero_lote' => ['nullable', 'max:255', 'string'],
             'reajuste_positivo' => ['nullable', 'numeric'],
+            'observaciones' => ['nullable', 'string'],
         ];
     }
 }

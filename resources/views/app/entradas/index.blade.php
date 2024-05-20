@@ -91,10 +91,7 @@
                             <td>{{ $entrada->cantidad ?? '-' }}</td>
                             <td>{{ $entrada->precio_unitario ?? '-' }}</td>
                             <td>{{ $entrada->fecha_vencimiento ?? '-' }}</td>
-                            <td>
-                                {{ optional($entrada->remitente)->nombre ?? '-'
-                                }}
-                            </td>
+                            <td>{{ $entrada->remitente ?? '-'}}</td>
                             <td>{{ $entrada->numero_lote ?? '-' }}</td>
                             <td>{{ $entrada->reajuste_positivo ?? '-' }}</td>
                             <td class="text-center" style="width: 134px;">
@@ -181,7 +178,11 @@
     </div>
   </div>
 </div>
-
+@if(Session::has('error'))
+    <div class="alert alert-danger">
+        {{ Session::get('error') }}
+    </div>
+@endif
 <script>
   @if(session('error'))
     $('#errorModal').find('.modal-body').text('{{ session("error") }}');

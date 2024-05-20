@@ -26,6 +26,7 @@
                 <th >REAJUSTE(+)(-)</th>
                 <th >CANTIDAD TOTAL</th>
                 <th >PRECIO</th>
+                <th >OBSERVACIONES</th>
             </tr>
         </thead>
         <tbody>
@@ -37,12 +38,13 @@
                     <td class="p-1">{{ $dato->Cantidad_Entrada }}</td>
                     <td class="p-1">{{ $dato->Precio_Unitario }}</td>
                     <td class="p-1">{{ $dato->Valor_Total }}</td>
-                    <td class="p-1">{{ $dato->Fecha_vencimiento }}</td>
+                    <td class="p-1">{{ $dato->Fecha_vencimiento ? $dato->Fecha_vencimiento : 'N/A' }}</td>
                     <td class="p-1">{{ $dato->Numero_Lote }}</td>
                     <td class="p-1">{{ $dato->Cantidad_Salida }}</td>
                     <td class="p-1">{{ $dato->Reajuste }}</td>
                     <td class="p-1">{{ $dato->Cantidad_Total}}</td>
                     <td class="p-1">{{ $dato->Precio}}</td>
+                    <td class="p-1">{{ $dato->Observaciones}}</td>
                 </tr>
             @empty
                 <tr>
